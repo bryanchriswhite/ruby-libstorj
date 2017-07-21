@@ -1,7 +1,8 @@
 # -*- ruby -*-
 
-require "rubygems"
-require "hoe"
+require 'rubygems'
+require 'hoe'
+require 'rake/extensiontask'
 
 # Hoe.plugin :compiler
 # Hoe.plugin :gem_prelude_sucks
@@ -10,18 +11,11 @@ require "hoe"
 # Hoe.plugin :rcov
 # Hoe.plugin :rdoc
 
-Hoe.spec "ruby-libstorj" do
-  # HEY! If you fill these out in ~/.hoe_template/default/Rakefile.erb then
-  # you'll never have to touch them again!
-  # (delete this comment too, of course)
-
-  # developer("FIX", "FIX@example.com")
-
-  # license "MIT" # this should match the license in the README
+Hoe.spec 'ruby-libstorj' do
   developer('Bryan White', 'bryanchriswhtie@gmail.com')
   self.readme_file = 'README.rdoc'
   self.history_file = 'CHANGELOG.rdoc'
-  self.extra_rdoc_filew = FileLust['*.rdoc']
+  self.extra_rdoc_files = FileList['*.rdoc']
   self.extra_dev_deps << ['rake-compiler', '>= 0']
   self.spec_extras = { :extensions => ["ext/libstorj/extconf.rb"]}
 

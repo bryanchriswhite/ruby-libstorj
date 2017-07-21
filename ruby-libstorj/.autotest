@@ -2,6 +2,12 @@
 
 require "autotest/restart"
 
+Autotest.add_hook :initialize do |at|
+    at.add_mapping(/.*\.c/) do |f,_|
+        at.files_matching(/test_.*rb$/)
+    end
+end
+
 # Autotest.add_hook :initialize do |at|
 #   at.testlib = "minitest/unit"
 #
@@ -19,6 +25,10 @@ require "autotest/restart"
 #     at.extra_class_map[klass] = "test/test_misc.rb"
 #   end
 # end
+
+Autotest.add_hook :run_command do |at|
+    system "rake clean compile"
+end
 
 # Autotest.add_hook :run_command do |at|
 #   system "rake build"
