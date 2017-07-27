@@ -6,7 +6,7 @@ require 'date'
 
 module LibStorj
   extend FFI::Library
-  ffi_lib ['libstorj']
+  ffi_lib('storj')
 
   class StorjBridgeOptions_t < FFI::Struct
     layout :proto, :pointer,
@@ -32,6 +32,39 @@ module LibStorj
   class StorjLogOptions_t < FFI::Struct
     layout :logger, :pointer,
            :level, :int
+  end
+
+  # class StorjLoggerFn_t < FFI::Struct
+  #   layout :options, StorjLogLevels_t,
+  #   # typedef void (*storj_logger_format_fn)(storj_log_options_t *options,
+  #   #                                        void *handle,
+  #   #                                        const char *format, ...);
+  # end
+
+  # attach_function('logger_format_fn', 'storj_logger_format_fn', [:string], :void)
+  #
+  # class StorjLogLevels_t < FFI::Struct
+  #   layout :debug, LibStorj.logger_format_fn('debug'),
+  #          :info, LibStorj.logger_format_fn('info'),
+  #          :warn, LibStorj.logger_format_fn('warn'),
+  #          :error, LibStorj.logger_format_fn('error')
+
+  #  # typedef struct storj_log_levels {
+  #  #   storj_logger_format_fn debug;
+  #  #   storj_logger_format_fn info;
+  #  #   storj_logger_format_fn warn;
+  #  #   storj_logger_format_fn error;
+  #  # } storj_log_levels_t;
+  # end
+
+  class StorjEnv_t < FFI::Struct
+    layout :storj_bridge_options, StorjBridgeOptions_t.ptr,
+           :storj_encrypt_options, StorjEncryptOptions_t.ptr,
+           :storj_http_options, StorjHttpOptions_t.ptr,
+           :storj_log_options, StorjLogOptions_t.ptr,
+           :tmp_path, :pointer, # char*
+           :loop, :pointer, # uv_loop_t*
+           :log, :pointer # storj_log_levels_t*
   end
 
   ### libstorj/src/storj.h:636-641
@@ -79,10 +112,10 @@ module LibStorj
   #                                        storj_log_options_t *log_options);
 
   attach_function('init_env', 'storj_init_env', [
-      StorjBridgeOptions_t.by_ref,
-      StorjEncryptOptions_t.by_ref,
-      StorjHttpOptions_t.by_ref,
-      StorjLogOptions_t.by_ref
+      StorjBridgeOptions_t.ptr,
+      StorjEncryptOptions_t.ptr,
+      StorjHttpOptions_t.ptr,
+      StorjLogOptions_t.ptr
   ], :uint64)
 
   def util_datetime
@@ -90,7 +123,8 @@ module LibStorj
     DateTime.strptime(util_timestamp.to_s, '%Q')
   end
 
-  # def Environment(bridge_options, encrypt_options, http_options, log_options)
+
+  # class Environment(bridge_options, encrypt_options, http_options, log_options)
   #
   # end
 

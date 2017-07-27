@@ -1,7 +1,19 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    byebug (9.0.6)
+    coderay (1.1.1)
     ffi (1.9.18)
+    method_source (0.8.2)
+    pry (0.10.4)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
+    pry-byebug (3.4.2)
+      byebug (~> 9.0)
+      pry (~> 0.10)
+    rice (2.1.1)
+    slop (3.6.0)
     uvrb (0.2.0)
       ffi (~> 1.9)
 
@@ -10,6 +22,9 @@ PLATFORMS
 
 DEPENDENCIES
   ffi!
+  pry!
+  pry-byebug!
+  rice!
   uvrb!
 
 BUNDLED WITH
