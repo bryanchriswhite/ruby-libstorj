@@ -1,0 +1,21 @@
+bridge:
+  proto: https
+  port: 443
+  host: api.storj.io
+  user: yourusername
+  pass: yourpassword
+
+encrypt:
+  mnemonic: 'this is not really a mnemonic and i hope it does not break anything'
+
+http:
+  user_agent: 'curl/7.52.1'
+  proxy_url:
+  cainfo_path: '/home/user/Projects/ruby-libstorj/cainfo'
+  low_speed_limit: 30720
+  low_speed_time: 20
+  timeout: 60
+
+log:
+  logger:
+  level: 0
