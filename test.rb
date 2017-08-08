@@ -1,7 +1,6 @@
 require 'yaml'
 require_relative './libstorj.rb'
-# require './ruby_libstorj'
-include LibStorjRuby
+include LibStorj
 
 def build_options(type_map)
   options_yml = YAML.load_file "#{__dir__}/test/options.yml"
@@ -45,12 +44,10 @@ end
 def test_env
   # do stuff..
   options = default_options
-  # puts options.inspect
 
   # binding.pry
-  LibStorjRuby.method(:init_env).call(*options)
+  LibStorj.method(:init_env).call(*options)
 end
 
 test_env
-# LibStorj.init_env 'yourusername', 'yourpassword'
 # LibStorj.init_test 'yourusername', 'yourpassword'
