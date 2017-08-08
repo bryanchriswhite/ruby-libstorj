@@ -91,7 +91,7 @@ module LibStorjRuby
       StorjEncryptOptions_t.ptr,
       StorjHttpOptions_t.ptr,
       StorjLogOptions_t.ptr
-  ], :pointer)
+  ], StorjEnv_t.ptr)
 
   def self.util_datetime
     # '%Q' - Number of milliseconds since 1970-01-01 00:00:00 UTC.
@@ -108,9 +108,11 @@ module LibStorjRuby
     http = StorjHttpOptions_t.new
     log = StorjLogOptions_t.new
 
-    bridge[:host] = string_to_pointer('http://api.storj.io')
-    bridge[:user] = string_to_pointer(username)
-    bridge[:pass] = string_to_pointer(password)
+    bridge[:proto] = string_to_pointer 'https'
+    bridge[:port] = 443
+    bridge[:host] = string_to_pointer 'api.storj.io'
+    bridge[:user] = string_to_pointer username
+    bridge[:pass] = string_to_pointer password
 
     encrypt[:mnemonic] = string_to_pointer('one two three four five six seven')
 

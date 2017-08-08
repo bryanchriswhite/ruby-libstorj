@@ -139,22 +139,6 @@ storj_env * init_storj_ruby(storj_bridge_options_t *bridge,
                               storj_encrypt_options_t *encrypt,
                               storj_http_options_t *http,
                               storj_log_options_t *log) {
-  printf("SANITY CHECK\n");
-//  printf("bridge.proto: %s\n", bridge->proto);
-//  printf("bridge.port: %d\n", bridge->port);
-//  printf("bridge.user: %s\n", bridge->user);
-//  printf("bridge.pass: %s\n", bridge->pass);
-//
-//  printf("encrypt.mnemonic: %s\n", encrypt->mnemonic);
-//
-//  printf("http.user_agent: %s\n", http->user_agent);
-//  printf("http.proxy_url: %s\n", http->proxy_url);
-//  printf("http.cainfo_path: %s\n", http->cainfo_path);
-  struct *defaults = build_options(bridge->user,
-                                   bridge->pass,
-
-                                   encrypt->mnemonic)
-
   printf("storj_init_env...");
   storj_env *env = storj_init_env(bridge,
                              encrypt,
