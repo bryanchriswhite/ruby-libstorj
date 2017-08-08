@@ -1,6 +1,7 @@
 require 'yaml'
 require_relative './libstorj.rb'
-include LibStorj
+# require './ruby_libstorj'
+include LibStorjRuby
 
 def build_options(type_map)
   options_yml = YAML.load_file "#{__dir__}/test/options.yml"
@@ -17,12 +18,12 @@ def build_options(type_map)
       option_field = member_field_hash[name]
 
       # TODO: check types and/or error handle
-      if value.nil?
-        option_instance[name] = FFI::Pointer::NULL
-      elsif option_field.is_a? FFI::StructLayout::Pointer
+      if option_field.nil?
+        option_instance = FFI::MemoryPointer::NULL
+      elsif option_field.is_a?(FFI::StructLayout::Pointer)
         # Currently assuming pointers are actually string type
         # (working around `ArgumentError: cannot set :string fields`)
-        pointer = FFI::MemoryPointer.from_string value
+        pointer = FFI::MemoryPointer.from_string(value.nil? ? '' : value)
         option_instance[name] = pointer
       else
         option_instance[name] = value
@@ -44,9 +45,12 @@ end
 def test_env
   # do stuff..
   options = default_options
-  puts options.inspect
+  # puts options.inspect
 
-  LibStorj.method(:init_env).call(*options)
+  # binding.pry
+  LibStorjRuby.method(:init_env).call(*options)
 end
 
 test_env
+# LibStorj.init_env 'yourusername', 'yourpassword'
+# LibStorj.init_test 'yourusername', 'yourpassword'

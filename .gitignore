@@ -1,3 +1,7 @@
 .idea/*
 *.sw*
 libstorj/
+*.o
+*.so
+*.a
+*.log

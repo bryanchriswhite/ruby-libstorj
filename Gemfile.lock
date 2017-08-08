@@ -14,8 +14,6 @@ GEM
       pry (~> 0.10)
     rice (2.1.1)
     slop (3.6.0)
-    uvrb (0.2.0)
-      ffi (~> 1.9)
 
 PLATFORMS
   ruby
@@ -25,7 +23,6 @@ DEPENDENCIES
   pry!
   pry-byebug!
   rice!
-  uvrb!
 
 BUNDLED WITH
    1.15.2
