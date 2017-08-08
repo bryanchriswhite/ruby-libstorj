@@ -2,64 +2,41 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "lib"), File.join(File.dirnam
 require 'rubygems'
 require 'ffi'
 require 'date'
+require_relative './ffi_shared'
 
 module LibStorj
-  STORJ_LOW_SPEED_LIMIT = 30720
-  STORJ_LOW_SPEED_TIME = 20
-  STORJ_HTTP_TIMEOUT = 60
-
-  extend FFI::Library
-  POINTER = FFI::MemoryPointer
-  ### NB: (build with `ruby ./extconf.rb && make` in project root)
-  ffi_lib "#{__dir__}/ruby_libstorj.so", 'storj'
-
-  class StorjBridgeOptions_t < FFI::Struct
-    layout :proto, :pointer,
-           :host, :pointer,
-           :port, :int,
-           :user, :pointer,
-           :pass, :pointer
-  end
-
-  class StorjEncryptOptions_t < FFI::Struct
-    layout :mnemonic, :pointer
-  end
-
-  class StorjHttpOptions_t < FFI::Struct
-    layout :user_agent, :pointer,
-           :proxy_url, :pointer,
-           :cainfo_path, :pointer,
-           :low_speed_limit, :long,
-           :low_speed_time, :long,
-           :timeout, :long
-  end
-
-  class StorjLogOptions_t < FFI::Struct
-    layout :logger, :pointer,
-           :level, :int
-  end
-
-  class StorjEnv_t < FFI::Struct
-    layout :storj_bridge_options, StorjBridgeOptions_t.ptr,
-           :storj_encrypt_options, StorjEncryptOptions_t.ptr,
-           :storj_http_options, StorjHttpOptions_t.ptr,
-           :storj_log_options, StorjLogOptions_t.ptr,
-           :tmp_path, :pointer, # char*
-           :loop, :pointer, # uv_loop_t*
-           :log, :pointer # storj_log_levels_t*
-  end
+  include FFIShared
 
   attach_function('util_timestamp', 'storj_util_timestamp', [], :uint64)
   attach_function('mnemonic_check', 'storj_mnemonic_check', [:string], :bool)
-  attach_function('init_env', 'init_storj_ruby', [
+
+  attach_function('_init_env', 'init_storj_ruby', [
       StorjBridgeOptions_t.ptr,
       StorjEncryptOptions_t.ptr,
       StorjHttpOptions_t.ptr,
       StorjLogOptions_t.ptr
   ], StorjEnv_t.ptr)
+  private_class_method :_init_env
+
+  LibStorj::Handle = Proc.new {|p1, p2| 'hello from Handle'.tap {|msg| puts msg}}
+  LibStorj::GetInfoCallback = Proc.new {|p1, p2| 'hello from GetInfoCallback' && nil}
+
+  callback :handle, [:pointer, :pointer], :pointer
+  callback :get_info_callback, [:pointer, :int], :void
+  attach_function('_get_info', 'storj_bridge_get_info', [LibStorj::StorjEnv_t.ptr,
+                                                         :handle,
+                                                         :get_info_callback], :int)
+  private_class_method :_get_info
+
+  def self.init_env(*options)
+    puts options.inspect
+    # options.each {|o| puts o.inspect}
+    self.method(:_init_env).call(*options)
+  end
 
   def self.util_datetime
     # '%Q' - Number of milliseconds since 1970-01-01 00:00:00 UTC.
     DateTime.strptime(util_timestamp.to_s, '%Q')
   end
+
 end

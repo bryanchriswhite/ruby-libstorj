@@ -1,5 +1,5 @@
 require 'yaml'
-require_relative './libstorj.rb'
+require_relative './storj_env.rb'
 include LibStorj
 
 def build_options(type_map)
@@ -44,10 +44,13 @@ end
 def test_env
   # do stuff..
   options = default_options
+  puts 'options: ' + options.inspect
 
   # binding.pry
   LibStorj.method(:init_env).call(*options)
 end
 
-test_env
+# test_env
 # LibStorj.init_test 'yourusername', 'yourpassword'
+
+# storj = StorjEnv.new(*default_options)
