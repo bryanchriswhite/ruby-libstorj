@@ -2,22 +2,11 @@ require 'rubygems'
 require 'ffi'
 
 module FFIShared
-  # module FFILibraryWrapper
-  #   extend FFI::Library
-  #   METHODS = %i[
-  #     attach_function
-  #     ffi_lib
-  #     callback
-  #   ].freeze
-  # end
-
   def self.included(base)
-    # FFILibraryWrapper::METHODS.each do |method|
-    #   base.define_singleton_method method, FFILibraryWrapper.method(method)
-    # end
-
     base.send :extend, FFI::Library
-    base.ffi_lib 'storj', "#{__dir__}/ruby_libstorj.so"
+    base.ffi_lib 'storj', 'uv', 'c', "#{__dir__}/ruby_libstorj.so"
+    ### NB: (build with `ruby ./extconf.rb && make` in project root)
+    # ffi_lib "#{__dir__}/ruby_libstorj.so", 'storj'
   end
 
   STORJ_LOW_SPEED_LIMIT = 30720
@@ -25,10 +14,6 @@ module FFIShared
   STORJ_HTTP_TIMEOUT = 60
 
   POINTER = FFI::MemoryPointer
-
-  # extend SharedLibs
-  ### NB: (build with `ruby ./extconf.rb && make` in project root)
-  # ffi_lib "#{__dir__}/ruby_libstorj.so", 'storj'
 
   class StorjBridgeOptions_t < FFI::Struct
     layout :proto, :pointer,

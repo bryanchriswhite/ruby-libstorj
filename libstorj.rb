@@ -32,10 +32,15 @@ module LibStorj
 
   LibStorj::Handle = callback :handle, [:pointer, :pointer], :pointer
   # LibStorj::GetInfoCallback = callback :get_info_callback, [:pointer, :int], :void
-  attach_function('_get_info', 'storj_bridge_get_info', [LibStorj::StorjEnv_t.ptr,
-                                                         Handle,
-                                                         :pointer], :int)
-  private_class_method :_get_info
+  attach_function('get_info', 'storj_bridge_get_info', [
+      LibStorj::StorjEnv_t.ptr,
+      Handle,
+      :pointer
+  ], :int)
+  # attach_function('_get_info', 'storj_bridge_get_info', [LibStorj::StorjEnv_t.ptr,
+  #                                                        Handle,
+  #                                                        :pointer], :int)
+  # private_class_method :_get_info
 
   def self.init_env(*options)
     puts options.inspect

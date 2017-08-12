@@ -44,6 +44,7 @@ reactor do |reactor|
   reactor.work {
     puts 'working...'
     # sleep 2
+    puts "ruby: default_loop: 0x#{Libuv::Ext.default_loop.address.to_s(16)}"
     Sample.queue_work Sample::Callback, Sample::AfterCallback
     # Sample.queue_work_without_gvl Sample::Callback, Sample::AfterCallback
   # }.then {

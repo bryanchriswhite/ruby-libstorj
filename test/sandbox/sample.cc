@@ -83,6 +83,7 @@ void queue_work(uv_work_cb cb, uv_after_work_cb a_cb) {
   printf("SANITY CHECK\n");
   uv_work_t worker;
   printf("beginning to queue work...\n");
+  printf("C: default loop: %p\n", uv_default_loop());
   uv_queue_work(uv_default_loop(), &worker, (uv_work_cb)cb, (uv_after_work_cb)a_cb);
 //  uv_queue_work_without_gvl(uv_default_loop(), &worker, callback, after_callback);
 //  ((void (*)())cb)();

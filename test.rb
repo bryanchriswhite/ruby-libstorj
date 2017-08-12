@@ -53,4 +53,8 @@ end
 # test_env
 # LibStorj.init_test 'yourusername', 'yourpassword'
 
-# storj = StorjEnv.new(*default_options)
+storj = StorjEnv.new(*default_options)
+
+res = storj.get_info do |w|
+  puts "hello from get_info block!"
+end
