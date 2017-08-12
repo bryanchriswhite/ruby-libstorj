@@ -7,6 +7,7 @@ module FFIShared
   #   METHODS = %i[
   #     attach_function
   #     ffi_lib
+  #     callback
   #   ].freeze
   # end
 

@@ -18,14 +18,23 @@ module LibStorj
   ], StorjEnv_t.ptr)
   private_class_method :_init_env
 
-  LibStorj::Handle = Proc.new {|p1, p2| 'hello from Handle'.tap {|msg| puts msg}}
-  LibStorj::GetInfoCallback = Proc.new {|p1, p2| 'hello from GetInfoCallback' && nil}
+  # LibStorj::Handle = Proc.new {|p1, p2| POINTER.from_string('hello from Handle'.tap {|msg| puts msg})}
+  # LibStorj::GetInfoCallback = Proc.new {|p1, p2| puts 'hello from GetInfoCallback' && nil}
+  # LibStorj::Handle = FFI::Function.new(:pointer, [:pointer, :pointer]) do |result_ptr, error_ptr|
+  #   # POINTER.from_string('hello from Handle'.tap {|msg| puts msg})
+  #   puts 'hello from Handle'
+  #   FFI::MemoryPointer.new :void
+  # end
+  # LibStorj::GetInfoCallback = FFI::Function.new(:void, [:pointer, :int]) do |uv_work_req_ptr, status|
+  #   puts 'hello from GetInfoCallback'
+  #   nil
+  # end
 
-  callback :handle, [:pointer, :pointer], :pointer
-  callback :get_info_callback, [:pointer, :int], :void
+  LibStorj::Handle = callback :handle, [:pointer, :pointer], :pointer
+  # LibStorj::GetInfoCallback = callback :get_info_callback, [:pointer, :int], :void
   attach_function('_get_info', 'storj_bridge_get_info', [LibStorj::StorjEnv_t.ptr,
-                                                         :handle,
-                                                         :get_info_callback], :int)
+                                                         Handle,
+                                                         :pointer], :int)
   private_class_method :_get_info
 
   def self.init_env(*options)

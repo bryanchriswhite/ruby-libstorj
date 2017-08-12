@@ -14,11 +14,17 @@ class StorjEnv
   end
 
   def get_info(&block)
-    # uv_work_cb
-    # handle_proc = Proc.new {puts 'handle_proc called!!'}
-    # cb_proc = Proc.new {puts 'cb_proc called!!'}
-    handle_proc = LibStorj::Handle
-    cb_proc = LibStorj::GetInfoCallback
-    _get_info @storj_env_ptr, handle_proc, cb_proc
+    puts @storj_env_ptr
+    # puts LibStorj::Handle
+    # puts LibStorj::GetInfoCallback
+    handle = FFI::Function.new(:pointer, [:pointer]) do |pointer|
+      puts 'hello from handle block1!!!'
+    end
+
+    get_info_callback = FFI::Function.new(:void, [LibStorj::Handle, :int]) do |handle, int|
+      puts 'hello from get_info_callback block1!!!'
+    end
+
+    _get_info @storj_env_ptr, handle, get_info_callback
   end
 end
