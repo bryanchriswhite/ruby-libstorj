@@ -44,7 +44,6 @@ end
 def test_env
   # do stuff..
   options = default_options
-  puts 'options: ' + options.inspect
 
   # binding.pry
   LibStorj.method(:init_env).call(*options)
@@ -55,6 +54,8 @@ end
 
 storj = StorjEnv.new(*default_options)
 
-res = storj.get_info do |w|
+res = storj.get_info do |error, response|
   puts "hello from get_info block!"
+  puts "error: #{error}"
+  puts "response: #{response}"
 end

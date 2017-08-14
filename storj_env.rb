@@ -5,36 +5,38 @@ require_relative './libstorj'
 require_relative 'ffi_shared'
 
 class StorjEnv
-  # include LibStorj
-  # include FFI::Library
   include FFIShared
 
   def initialize(*options)
-    puts options.inspect
     @storj_env_ptr = LibStorj.method(:init_env).call(*options)
     @storj_env_ptr[:loop] = Libuv::Ext.default_loop
   end
 
   def get_info(&block)
-    puts @storj_env_ptr
-    # puts LibStorj::Handle
-    # puts LibStorj::GetInfoCallback
-    handle = FFI::Function.new(:pointer, [:pointer]) do |pointer|
-      puts 'hello from handle block1!!!'
+    handle = FFI::Function.new(:void, [:string, :string], &block)
+
+    get_info_callback = FFI::Function.new(:void, [UVWork_t.ptr, :int]) do |work_req, status|
+      error_code, status_code, body, response = work_req[:data].values_at(
+          options: {json: %i[body response]},
+          members: %i[error_code status_code body response handle]
+      )
+
+      # begin
+      error = nil
+      if error_code || response == POINTER::NULL
+        error = error_code ? "wip error w/ code: #{error_code}" : 'wip error'
+      end
+
+      handle.call error, response
+      # rescue => e
+      #   binding.pry
+      # end
     end
 
-    get_info_callback = FFI::Function.new(:void, [LibStorj::Handle, :int]) do |handle, int|
-      puts 'hello from get_info_callback block1!!!'
-    end
-
-    # _get_info @storj_env_ptr, handle, get_info_callback
     reactor do |reactor|
-      puts 'ruby: beginning of do'
       reactor.work {
-        puts 'ruby: inside work'
         LibStorj.get_info @storj_env_ptr, handle, get_info_callback
       }
-      puts 'ruby: end of do'
     end
   end
 end

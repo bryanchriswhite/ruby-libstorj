@@ -4,10 +4,15 @@ require 'ffi'
 module FFIShared
   def self.included(base)
     base.send :extend, FFI::Library
-    base.ffi_lib 'storj', 'uv', 'c', "#{__dir__}/ruby_libstorj.so"
+    base.ffi_lib 'storj', 'uv', 'json-c', 'c', "#{__dir__}/ruby_libstorj.so"
     ### NB: (build with `ruby ./extconf.rb && make` in project root)
     # ffi_lib "#{__dir__}/ruby_libstorj.so", 'storj'
   end
+
+  # apply `extend FFI::Library`, etc. to self
+  included(self)
+
+  attach_function('parse_json', 'json_object_to_json_string', [:pointer], :string)
 
   STORJ_LOW_SPEED_LIMIT = 30720
   STORJ_LOW_SPEED_TIME = 20
@@ -40,6 +45,55 @@ module FFIShared
     layout :logger, :pointer,
            :level, :int
   end
+
+  Handle = callback :handle, [:string, :string], :void
+
+  class JsonRequest_t < FFI::Struct
+    layout :http_options, StorjHttpOptions_t.ptr,
+           :options, StorjBridgeOptions_t.ptr,
+           :method, :string,
+           :path, :string,
+           :auth, :bool,
+           :body, :pointer,     # struct json_object *body;
+           :response, :pointer, # struct json_object *response;
+           :error_code, :int,
+           :status_code, :int,
+           :handle, Handle
+  end
+
+  enum :uv_work_req, [
+      :UV_UNKNOWN_REQ, 0,
+      :UV_REQ,
+      :UV_CONNECT,
+      :UV_WRITE,
+      :UV_SHUTDOWN,
+      :UV_UDP_SEND,
+      :UV_FS,
+      :UV_WORK,
+      :UV_GETADDRINFO,
+      :UV_GETNAMEINFO,
+      :UV_REQ_TYPE_PRIVATE,
+      :UV_REQ_TYPE_MAX,
+  ]
+
+  class UVWork_t < FFI::Struct
+    layout :data, JsonRequest_t.ptr,
+           # /* read-only */                                                             \
+           :type, :uv_work_req,
+           # /* private */                                                               \
+           :active_queue, :pointer,
+           :reserved, :pointer,
+           :loop, :pointer,
+           :work_cb, :pointer,
+           :after_work_cb, :pointer
+
+    # void* active_queue[2];                                                      \
+    # void* reserved[4];                                                          \
+    # ...
+    #   UV_WORK_PRIVATE_FIELDS
+    # };
+  end
+
 
   class StorjEnv_t < FFI::Struct
     layout :storj_bridge_options, StorjBridgeOptions_t.ptr,
