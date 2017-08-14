@@ -5,3 +5,4 @@ libstorj/
 *.so
 *.a
 *.log
+test/options.yml
