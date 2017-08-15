@@ -1,3 +1,8 @@
+PATH
+  remote: .
+  specs:
+    ruby_libstorj (0.0.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -21,7 +26,8 @@ GEM
       byebug (~> 9.0)
       pry (~> 0.10)
     rake (12.0.0)
-    rice (2.1.1)
+    rake-compiler (1.0.4)
+      rake
     ruby-tls (2.3.0)
       concurrent-ruby (~> 1.0)
       ffi-compiler (>= 1.0, < 2.0)
@@ -35,7 +41,9 @@ DEPENDENCIES
   libuv!
   pry!
   pry-byebug!
-  rice!
+  rake!
+  rake-compiler!
+  ruby_libstorj!
 
 BUNDLED WITH
    1.15.2

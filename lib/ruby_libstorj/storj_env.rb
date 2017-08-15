@@ -24,7 +24,7 @@ class StorjEnv
 
       # begin
       error = nil
-      if error_code || response == POINTER::NULL
+      if error_code || (response == 'null' || response == POINTER::NULL)
         error = error_code ? "wip error w/ code: #{error_code}" : 'wip error'
       end
 
