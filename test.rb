@@ -1,5 +1,6 @@
 require 'yaml'
-require_relative './storj_env.rb'
+# require_relative './storj_env.rb'
+require 'ruby_libstorj'
 include LibStorj
 
 def build_options(type_map)
@@ -35,10 +36,10 @@ def build_options(type_map)
 end
 
 def default_options
-  build_options bridge: StorjBridgeOptions_t,
-                encrypt: StorjEncryptOptions_t,
-                http: StorjHttpOptions_t,
-                log: StorjLogOptions_t
+  build_options bridge: ::LibStorj::Ext::Storj::BridgeOptions,
+                encrypt: ::LibStorj::Ext::Storj::EncryptOptions,
+                http: ::LibStorj::Ext::Storj::HttpOptions,
+                log: ::LibStorj::Ext::Storj::LogOptions
 end
 
 def test_env
@@ -52,7 +53,7 @@ end
 # test_env
 # LibStorj.init_test 'yourusername', 'yourpassword'
 
-storj = StorjEnv.new(*default_options)
+storj = LibStorj::Env.new(*default_options)
 
 storj.get_info do |error, response|
   puts "hello from get_info block!"

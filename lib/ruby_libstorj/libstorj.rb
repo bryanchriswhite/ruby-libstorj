@@ -2,12 +2,20 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "lib"), File.join(File.dirnam
 require 'rubygems'
 require 'ffi'
 require 'date'
-require_relative './ffi_shared'
 
 module LibStorj
-  include FFIShared
+  require 'ruby_libstorj/ext/types'
+  require 'ruby_libstorj/ext/ext'
 
-  # convenience method for inspecting struct hierarchies
+  require 'ruby_libstorj/env'
+
+  include ::LibStorj::Ext::Storj::Misc
+
+  def self.util_datetime
+    # '%Q' - Number of milliseconds since 1970-01-01 00:00:00 UTC.
+    DateTime.strptime(::LibStorj::Ext::Storj.util_timestamp.to_s, '%Q')
+  end
+
   class FFI::Struct
     # allows for destructuring. NB: `values_at` members array order
     #   must match assignment order!
@@ -20,17 +28,21 @@ module LibStorj
     #       log_options = StorjLogOptions_t.new(...)
     #       logger, level = log_options.values_at(members: [:logger, :level])
     #       ```
+
     def values_at(options: {}, members:)
       if options[:json].nil?
         members.map {|member_name| self[member_name]} if options[:json].nil?
       else
         members.map do |member_name|
           value = self[member_name]
-          if value.is_a?(FFI::Pointer) && options[:json].include?(member_name)
+          if value.is_a?(FFI::Pointer) &&
+              value != FFI::MemoryPointer::NULL &&
+              options[:json].include?(member_name)
             # just return the pointer if this raises an exception
             begin
-              next LibStorj.parse_json(value)
-            rescue
+              next ::LibStorj::Ext::JsonC.parse_json(value)
+            rescue #=> e
+              # TODO: better error handling
               next value
             end
           end
@@ -40,6 +52,7 @@ module LibStorj
       end
     end
 
+    # convenience method for inspecting struct hierarchies
     def map_layout
       # NB: Hash[ [ [key, value], ... ] ] → new_hash
       Hash[members.map do |member_name|
@@ -63,33 +76,4 @@ module LibStorj
       end]
     end
   end
-
-  # attach_function('curl_error', 'curl_easy_strerror', [:pointer], :string)
-
-  attach_function('util_timestamp', 'storj_util_timestamp', [], :uint64)
-  attach_function('mnemonic_check', 'storj_mnemonic_check', [:string], :bool)
-
-  attach_function('get_info', 'storj_bridge_get_info', [
-      LibStorj::StorjEnv_t.ptr,
-      Handle,
-      :pointer
-  ], :int)
-
-  def self.init_env(*options)
-    self.method(:_init_env).call(*options)
-  end
-
-  attach_function('_init_env', 'init_storj_ruby', [
-      StorjBridgeOptions_t.ptr,
-      StorjEncryptOptions_t.ptr,
-      StorjHttpOptions_t.ptr,
-      StorjLogOptions_t.ptr
-  ], StorjEnv_t.ptr)
-  private_class_method :_init_env
-
-  def self.util_datetime
-    # '%Q' - Number of milliseconds since 1970-01-01 00:00:00 UTC.
-    DateTime.strptime(util_timestamp.to_s, '%Q')
-  end
-
 end

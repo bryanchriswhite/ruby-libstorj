@@ -14,7 +14,65 @@ module LibStorj
     #       `write_<type> (FFI::Pointer#write_<type>)`
     #     methods to read and write respectively
 
+    module Storj
+      extend FFI::Library
+
+      class BridgeOptions < FFI::Struct
+        layout :proto, :pointer,
+               :host, :pointer,
+               :port, :int,
+               :user, :pointer,
+               :pass, :pointer
+      end
+
+      class EncryptOptions < FFI::Struct
+        layout :mnemonic, :pointer
+      end
+
+      class HttpOptions < FFI::Struct
+        layout :user_agent, :pointer,
+               :proxy_url, :pointer,
+               :cainfo_path, :pointer,
+               :low_speed_limit, :long,
+               :low_speed_time, :long,
+               :timeout, :long
+      end
+
+      class LogOptions < FFI::Struct
+        layout :logger, :pointer,
+               :level, :int
+      end
+
+      JSON_REQUEST_CALLBACK = callback [:string, :string], :void
+      # JSON_REQUEST_CALLBACK = callback :json_request_callback [:string, :string], :void
+
+      class JsonRequest_t < FFI::Struct
+        layout :http_options, HttpOptions.ptr,
+               :options, BridgeOptions.ptr,
+               :method, :string,
+               :path, :string,
+               :auth, :bool,
+               :body, :pointer, # struct json_object *body;
+               :response, :pointer, # struct json_object *response;
+               :error_code, :int,
+               :status_code, :int,
+               :handle, JSON_REQUEST_CALLBACK
+      end
+
+      class Env < FFI::Struct
+        layout :storj_bridge_options, BridgeOptions.ptr,
+               :storj_encrypt_options, EncryptOptions.ptr,
+               :storj_http_options, HttpOptions.ptr,
+               :storj_log_options, LogOptions.ptr,
+               :tmp_path, :pointer,
+               :loop, :pointer, # uv_loop_t*
+               :log, :pointer # storj_log_levels_t*
+      end
+    end
+
     module UV
+      extend FFI::Library
+
       enum :uv_work_req, [
           :UV_UNKNOWN_REQ, 0,
           :UV_REQ,
@@ -30,8 +88,8 @@ module LibStorj
           :UV_REQ_TYPE_MAX,
       ]
 
-      class UVWork_t < FFI::Struct
-        layout :data, JsonRequest_t.ptr,
+      class UVWork < FFI::Struct
+        layout :data, Ext::Storj::JsonRequest_t.ptr,
                # read-only
                :type, :uv_work_req,
                # private
@@ -49,58 +107,5 @@ module LibStorj
       end
     end
 
-    module Storj
-      class StorjBridgeOptions_t < FFI::Struct
-        layout :proto, :pointer,
-               :host, :pointer,
-               :port, :int,
-               :user, :pointer,
-               :pass, :pointer
-      end
-
-      class StorjEncryptOptions_t < FFI::Struct
-        layout :mnemonic, :pointer
-      end
-
-      class StorjHttpOptions_t < FFI::Struct
-        layout :user_agent, :pointer,
-               :proxy_url, :pointer,
-               :cainfo_path, :pointer,
-               :low_speed_limit, :long,
-               :low_speed_time, :long,
-               :timeout, :long
-      end
-
-      class StorjLogOptions_t < FFI::Struct
-        layout :logger, :pointer,
-               :level, :int
-      end
-
-      JSON_REQUEST_CALLBACK = callback [:string, :string], :void
-      # JSON_REQUEST_CALLBACK = callback :json_request_callback [:string, :string], :void
-
-      class JsonRequest_t < FFI::Struct
-        layout :http_options, StorjHttpOptions_t.ptr,
-               :options, StorjBridgeOptions_t.ptr,
-               :method, :string,
-               :path, :string,
-               :auth, :bool,
-               :body, :pointer, # struct json_object *body;
-               :response, :pointer, # struct json_object *response;
-               :error_code, :int,
-               :status_code, :int,
-               :handle, Handle
-      end
-
-      class StorjEnv_t < FFI::Struct
-        layout :storj_bridge_options, StorjBridgeOptions_t.ptr,
-               :storj_encrypt_options, StorjEncryptOptions_t.ptr,
-               :storj_http_options, StorjHttpOptions_t.ptr,
-               :storj_log_options, StorjLogOptions_t.ptr,
-               :tmp_path, :pointer,
-               :loop, :pointer, # uv_loop_t*
-               :log, :pointer # storj_log_levels_t*
-      end
-    end
   end
 end
