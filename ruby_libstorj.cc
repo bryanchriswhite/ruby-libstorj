@@ -49,11 +49,11 @@ storj_env * init_storj_ruby(storj_bridge_options_t *bridge,
                               storj_encrypt_options_t *encrypt,
                               storj_http_options_t *http,
                               storj_log_options_t *log) {
-  printf("storj_init_env...");
+//  printf("storj_init_env...");
   storj_env *env = storj_init_env(bridge,
                              encrypt,
                              http,
                              log);
-  printf("done!!! - returning to ruby\n");
+//  printf("done!!! - returning to ruby\n");
   return env;
 }

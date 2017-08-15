@@ -1,3 +1,4 @@
+require 'pp'
 require 'rubygems'
 require 'ffi'
 require 'libuv'
@@ -26,6 +27,8 @@ class StorjEnv
       if error_code || response == POINTER::NULL
         error = error_code ? "wip error w/ code: #{error_code}" : 'wip error'
       end
+
+      pp work_req.map_layout
 
       handle.call error, response
       # rescue => e

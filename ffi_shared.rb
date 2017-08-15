@@ -4,7 +4,7 @@ require 'ffi'
 module FFIShared
   def self.included(base)
     base.send :extend, FFI::Library
-    base.ffi_lib 'storj', 'uv', 'json-c', 'c', "#{__dir__}/ruby_libstorj.so"
+    base.ffi_lib 'storj', 'curl', 'uv', 'json-c', 'c', "#{__dir__}/ruby_libstorj.so"
     ### NB: (build with `ruby ./extconf.rb && make` in project root)
     # ffi_lib "#{__dir__}/ruby_libstorj.so", 'storj'
   end
@@ -19,6 +19,20 @@ module FFIShared
   STORJ_HTTP_TIMEOUT = 60
 
   POINTER = FFI::MemoryPointer
+
+  # NB: Ruby's ffi doesn't allow assigning to :string' pointer
+  #     types.
+  #
+  #     You can use `FFI::MemoryPointer.from_string` to create a
+  #     string pointer from a ruby string. Or use the
+  #     `FFI::Pointer#write_string` method to update an existing
+  #     string (or generic) pointer; see below
+  #
+  # NB: All pointer types use have
+  #       `read_<type> (FFI::Pointer#read_<type>)`
+  #                 and
+  #       `write_<type> (FFI::Pointer#write_<type>)`
+  #     methods to read and write respectively
 
   class StorjBridgeOptions_t < FFI::Struct
     layout :proto, :pointer,
@@ -100,7 +114,7 @@ module FFIShared
            :storj_encrypt_options, StorjEncryptOptions_t.ptr,
            :storj_http_options, StorjHttpOptions_t.ptr,
            :storj_log_options, StorjLogOptions_t.ptr,
-           :tmp_path, :pointer, # char*
+           :tmp_path, :pointer,
            :loop, :pointer, # uv_loop_t*
            :log, :pointer # storj_log_levels_t*
   end

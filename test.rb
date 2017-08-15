@@ -20,8 +20,8 @@ def build_options(type_map)
       if option_field.nil?
         option_instance = FFI::MemoryPointer::NULL
       elsif option_field.is_a?(FFI::StructLayout::Pointer)
-        # Currently assuming pointers are actually string type
-        # (working around `ArgumentError: cannot set :string fields`)
+        # Assuming pointers are strings
+        #
         pointer = FFI::MemoryPointer.from_string(value.nil? ? '' : value)
         option_instance[name] = pointer
       else
@@ -54,7 +54,7 @@ end
 
 storj = StorjEnv.new(*default_options)
 
-res = storj.get_info do |error, response|
+storj.get_info do |error, response|
   puts "hello from get_info block!"
   puts "error: #{error}"
   puts "response: #{response}"

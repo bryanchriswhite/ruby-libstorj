@@ -12,9 +12,13 @@ module LibStorj
     # allows for destructuring. NB: `values_at` members array order
     #   must match assignment order!
     #
+    # options hash:
+    #   - :json, an array of symbols for which respective layout
+    #            members will be passed through `json_parse`
+    #
     # example: ```
     #       log_options = StorjLogOptions_t.new(...)
-    #       logger, level = log_options.values_at members: [:logger, :level])
+    #       logger, level = log_options.values_at(members: [:logger, :level])
     #       ```
     def values_at(options: {}, members:)
       if options[:json].nil?
@@ -22,8 +26,13 @@ module LibStorj
       else
         members.map do |member_name|
           value = self[member_name]
-          if options[:json].include?(member_name)
-            next LibStorj.parse_json(value)
+          if value.is_a?(FFI::Pointer) && options[:json].include?(member_name)
+            # just return the pointer if this raises an exception
+            begin
+              next LibStorj.parse_json(value)
+            rescue
+              next value
+            end
           end
 
           value
@@ -32,6 +41,7 @@ module LibStorj
     end
 
     def map_layout
+      # NB: Hash[ [ [key, value], ... ] ] → new_hash
       Hash[members.map do |member_name|
         member = self[member_name]
         value = member.is_a?(FFI::Struct) ? member.map_layout : member

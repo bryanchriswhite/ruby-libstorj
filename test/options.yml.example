@@ -11,7 +11,8 @@ encrypt:
 http:
   user_agent: 'curl/7.52.1'
   proxy_url:
-  cainfo_path: '/home/user/Projects/ruby-libstorj/cainfo'
+  #cainfo_path: #-- leave blank to use curl default CA bundle, see:
+  #                 (https://curl.haxx.se/libcurl/c/CURLOPT_CAINFO.html)
   low_speed_limit: 30720
   low_speed_time: 20
   timeout: 60
