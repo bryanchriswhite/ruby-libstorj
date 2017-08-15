@@ -18,7 +18,7 @@ module LibStorj
 
         # begin
         error = nil
-        if error_code || (response == 'null' || response == POINTER::NULL)
+        if !error_code.nil? || (response == 'null' || response == POINTER::NULL)
           error = error_code ? "wip error w/ code: #{error_code}" : 'wip error'
         end
 

@@ -15,10 +15,14 @@ rake compile
 
 build gem:
 ```bash
-gem build
+rake
+# OR
+#rake build
 ```
 
 install gem:
 ```bash
-gem install --local ./ruby_libstorj-0.0.0.gem  --no-ri --no-rdoc  
+rake install
+# OR (in case `rake install` doesn't work)
+# gem install --local ./ruby_libstorj-*.gem  --no-ri --no-rdoc  
 ```
