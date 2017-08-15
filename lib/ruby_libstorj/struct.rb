@@ -13,7 +13,7 @@ module LibStorj
     #       ```
 
     def values_at(*members)
-      members.map {|member_name| self[member_name]}
+      members.flatten.map {|member_name| self[member_name]}
     end
 
     # convenience method for inspecting struct hierarchies
@@ -23,7 +23,7 @@ module LibStorj
         member = self[member_name]
         value = member.is_a?(FFI::Struct) ? member.map_layout : member
         if value.is_a? FFI::Pointer
-          next [member_name, nil] if value == FFI::MemoryPointer::NULL
+          next [member_name, nil] if value.null?
 
           # attempt to read as string
           begin
@@ -33,8 +33,9 @@ module LibStorj
               value = string_value
             end
           rescue
+            # do nothing...
+            # let value remain a pointer if an exception was raised
           end
-
         end
         [member_name, value]
       end]

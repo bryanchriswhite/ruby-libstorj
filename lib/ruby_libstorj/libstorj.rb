@@ -9,10 +9,7 @@ module LibStorj
   require 'ruby_libstorj/ext/ext'
 
   require 'ruby_libstorj/env'
-
-  include ::LibStorj::Ext::Storj::Public
-  # util_timestamp
-  # mnemonic_check
+  require 'ruby_libstorj/mixins/storj'
 
   def self.util_datetime
     # '%Q' - Number of milliseconds since 1970-01-01 00:00:00 UTC.
@@ -33,4 +30,7 @@ module LibStorj
       throw 'json_pointer was a pointer (null or otherwise); json_pointer.class: #{json_pointer.class}'
     end
   end
+
+  require 'ruby_libstorj/factory.rb'
+  require 'ruby_libstorj/callback.rb'
 end
