@@ -1,5 +1,19 @@
 module LibStorj
   module Ext
+    module Curl
+      extend FFI::Library
+      ffi_lib('curl')
+
+      attach_function('easy_stderr', 'curl_easy_strerror', [:curl_code], :string)
+    end
+
+    module JsonC
+      extend FFI::Library
+      ffi_lib('json-c')
+
+      attach_function('parse_json', 'json_object_to_json_string', [:pointer], :string)
+    end
+
     module Storj
       extend FFI::Library
       ffi_lib('storj')
@@ -18,26 +32,13 @@ module LibStorj
           LogOptions.ptr
       ], Env.ptr)
 
-      module Misc
+      module Public
         extend FFI::Library
         ffi_lib('storj')
 
         attach_function('util_timestamp', 'storj_util_timestamp', [], :uint64)
         attach_function('mnemonic_check', 'storj_mnemonic_check', [:string], :bool)
       end
-    end
-
-    module JsonC
-      extend FFI::Library
-      ffi_lib('json-c')
-
-      attach_function('parse_json', 'json_object_to_json_string', [:pointer], :string)
-    end
-
-    module Curl
-      extend FFI::Library
-      ffi_lib('curl')
-      # attach_function('curl_error', 'curl_easy_strerror', [:pointer], :string)
     end
 
     module UV

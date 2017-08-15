@@ -9,7 +9,7 @@ module LibStorj
 
   require 'ruby_libstorj/env'
 
-  include ::LibStorj::Ext::Storj::Misc
+  include ::LibStorj::Ext::Storj::Public
 
   def self.util_datetime
     # '%Q' - Number of milliseconds since 1970-01-01 00:00:00 UTC.
@@ -43,6 +43,7 @@ module LibStorj
               next ::LibStorj::Ext::JsonC.parse_json(value)
             rescue #=> e
               # TODO: better error handling
+              # binding.pry
               next value
             end
           end

@@ -14,6 +14,14 @@ module LibStorj
     #       `write_<type> (FFI::Pointer#write_<type>)`
     #     methods to read and write respectively
 
+    module Curl
+      extend FFI::Library
+
+      require 'ruby_libstorj/ext/curl_code'
+
+      enum(:curl_code, CURL_CODES)
+    end
+
     module Storj
       extend FFI::Library
 
