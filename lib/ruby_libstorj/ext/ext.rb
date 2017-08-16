@@ -25,6 +25,13 @@ module LibStorj
       # ::LibStorj::UV::
       ], :int)
 
+      attach_function('get_buckets', 'storj_bridge_get_buckets', [
+          Env.ptr,
+          JSON_REQUEST_CALLBACK,
+          :pointer # uv_after_work_cb*
+      # ::LibStorj::UV::
+      ], :int)
+
       attach_function('init_env', 'storj_init_env', [
           BridgeOptions.ptr,
           EncryptOptions.ptr,

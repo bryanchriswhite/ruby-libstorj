@@ -1,7 +1,5 @@
 require 'yaml'
-# require_relative './storj_env.rb'
 require 'ruby_libstorj'
-include LibStorj
 
 def build_options(type_map)
   options_yml = YAML.load_file "#{__dir__}/test/options.yml"
@@ -42,21 +40,14 @@ def default_options
                 log: ::LibStorj::Ext::Storj::LogOptions
 end
 
-def test_env
-  # do stuff..
-  options = default_options
-
-  # binding.pry
-  LibStorj.method(:init_env).call(*options)
-end
-
-# test_env
-# LibStorj.init_test 'yourusername', 'yourpassword'
-
 storj = LibStorj::Env.new(*default_options)
 
 storj.get_info do |error, response|
-  puts "hello from get_info block!"
   puts "error: #{error}"
   puts "response: #{response}"
 end
+
+# storj.get_buckets do |error, response|
+#   puts "error: #{error}"
+#   puts "response: #{response}"
+# end

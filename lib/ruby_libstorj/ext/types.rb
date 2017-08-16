@@ -52,7 +52,6 @@ module LibStorj
       end
 
       JSON_REQUEST_CALLBACK = callback [:string, :string], :void
-      # JSON_REQUEST_CALLBACK = callback :json_request_callback [:string, :string], :void
 
       class JsonRequest_t < FFI::Struct
         layout :http_options, HttpOptions.ptr,
