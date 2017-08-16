@@ -33,6 +33,8 @@ This project primarily uses the ruby [`ffi`](https://rubygems.org/gems/ffi) (for
 If the ffi api becomes insufficient the ruby gem [`rice`](https://rubygems.org/gems/rice) has proven extremely useful for doing rub things in C/C++.
 Otherwise, you're going to want to read up on [ruby's C API](https://silverhammermba.github.io/emberb/c/)
 
+This project strives to conform to the ruby  and rubygems standards and conventions. See [rubygems.org guide on "Make Your Own Gem"](http://guides.rubygems.org/make-your-own-gem/) for more.
+
 #### Tooling:
 + `bundler` (see http://bundler.io/)
   - dependency management
