@@ -3,13 +3,11 @@ module LibStorj
     # allows for destructuring. NB: `values_at` members array order
     #   must match assignment order!
     #
-    # options hash:
-    #   - :json, an array of symbols for which respective layout
-    #            members will be passed through `json_parse`
-    #
     # example: ```
     #       log_options = StorjLogOptions_t.new(...)
-    #       logger, level = log_options.values_at(members: [:logger, :level])
+    #       logger, level = log_options.values_at(:logger, :level)
+    #       # OR logger, level = log_options.values_at([:logger, :level])
+    #       # OR logger, level = log_options.values_at(%i[logger level])
     #       ```
 
     def values_at(*members)

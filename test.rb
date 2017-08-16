@@ -40,14 +40,3 @@ def default_options
                 log: ::LibStorj::Ext::Storj::LogOptions
 end
 
-storj = LibStorj::Env.new(*default_options)
-
-storj.get_info do |error, response|
-  puts "error: #{error}"
-  puts "response: #{response}"
-end
-
-# storj.get_buckets do |error, response|
-#   puts "error: #{error}"
-#   puts "response: #{response}"
-# end
