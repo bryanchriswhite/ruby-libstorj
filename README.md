@@ -77,14 +77,39 @@ rake
     ```
 
 ### Run tests:
+#### A quick note on rspec formatters:
+The "progress" (aka "dots") formatter is the default but it's not my peronsal favorite for development.
+This repo makes it easy to change formatters when invoking rspec via `rspec` or `rake` binaries.
+
+With that said, here are your options:
+```bash
+$ rspec --help | less
+    #=>
+-f, --format FORMATTER   Choose a formatter.
+                         [p]rogress (default - dots)
+                         [d]ocumentation (group and example names)
+                         [h]tml
+                         [j]son
+                         custom formatter class name
+```
+_(give "documentation" a try for BDD/TDD or... well, documentation, of course)_
+
 + with `rake`:
     ```bash
-    rake test   # any dependant tasks will be run
+    rake test
+    
+    # pass <formatter> to rspec as `--format <formatter>` 
+    # rake test[<formatter]
+    #
+    # e.g. (the following are all equivalent):
+    # rake test[doc]
+    # rake test[d]
+    # rake spec[d]
     ```
     
-    Rake will run any dependencies of the `:test` task
+    Keep in mind that rake will also run any dependencies of the `:test` task
     
-    (e.g. Start a web server or db server or something)
+    _(e.g. Start a web server or db server or something)_
 + with `rspec`:
     ```bash
     rspec   # cli args can be passed directly to rspec
@@ -93,7 +118,7 @@ rake
     Change the rspec formatter:
     
     ```bash
-    rspec --format doc   # use the '[d]ocument' rspec formatter
+    rspec --format doc   # use the 'document' rspec formatter
     
     # short version
     # rspec -f d
