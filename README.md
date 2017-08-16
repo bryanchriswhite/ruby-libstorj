@@ -26,3 +26,10 @@ rake install
 # OR (in case `rake install` doesn't work)
 # gem install --local ./ruby_libstorj-*.gem  --no-ri --no-rdoc  
 ```
+
+run tests:
+```bash
+rake spec # via rake; dependant tasks will be run (if any)
+# OR
+# rspec # via rspec binary; cli args can be directly passed to rspec
+```
