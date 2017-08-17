@@ -33,6 +33,13 @@ module LibStorj
                :pass, :pointer
       end
 
+      class BucketMeta < FFI::Struct
+        layout :created, :string,
+               :name, :string,
+               :id, :string,
+               :decrypted, :bool
+      end
+
       class EncryptOptions < FFI::Struct
         layout :mnemonic, :pointer
       end
@@ -51,19 +58,35 @@ module LibStorj
                :level, :int
       end
 
+      class GetBucketRequest < FFI::Struct
+        layout :http_options, HttpOptions.ptr,
+               :encrypt_options, EncryptOptions.ptr,
+               :options, BridgeOptions.ptr,
+               :method, :string,
+               :path, :string,
+               :auth, :bool,
+               :body, :pointer,     # struct json_object *body;
+               :response, :pointer, # struct json_object *body;
+               :buckets, BucketMeta.ptr,
+               :total_buckets, :uint32,
+               :error_code, :int,
+               :status_code, :int,
+               :handle, :pointer    # void*
+      end
+
       JSON_REQUEST_CALLBACK = callback [:string, :string], :void
 
-      class JsonRequest_t < FFI::Struct
+      class JsonRequest < FFI::Struct
         layout :http_options, HttpOptions.ptr,
                :options, BridgeOptions.ptr,
                :method, :string,
                :path, :string,
                :auth, :bool,
-               :body, :pointer, # struct json_object *body;
+               :body, :pointer,     # struct json_object *body;
                :response, :pointer, # struct json_object *response;
                :error_code, :int,
                :status_code, :int,
-               :handle, JSON_REQUEST_CALLBACK
+               :handle, :pointer    # void*
       end
 
       class Env < FFI::Struct
@@ -96,7 +119,7 @@ module LibStorj
       ]
 
       class Work < FFI::Struct
-        layout :data, Ext::Storj::JsonRequest_t.ptr,
+        layout :data, :pointer,   # void*
                # read-only
                :type, :uv_work_req,
                # private

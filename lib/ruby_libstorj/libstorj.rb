@@ -25,7 +25,6 @@ module LibStorj
       ::LibStorj::Ext::JsonC.parse_json(json_pointer)
       # TODO: better error handling
       # rescue #=> e
-      #   binding.pry
       # end
     else
       throw 'json_pointer was a pointer (null or otherwise); json_pointer.class: #{json_pointer.class}'

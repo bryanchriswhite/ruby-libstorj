@@ -3,7 +3,7 @@
 #     while also forwarding arguments. We're using it here to allow
 #     the tasks, "spec", and "test" work identically
 module LibStorj
-  class ProxyTask
+  class ArgForwardingTask
     def initialize(target, task_aliases: [nil], args_deps_hash:, &block)
       task_aliases.flatten.each do |task_name|
         # if no aliases, register `target` with no dependencies

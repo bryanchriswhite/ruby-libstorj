@@ -25,13 +25,52 @@ RSpec.describe LibStorj::Env do
   end
 
   describe '#get_info' do
-    context 'no error' do
+    context 'without error' do
       include_examples '@instance of described class'
 
-      it 'should yield with an error value of `nil`' do
+      it 'yields with an error value of `nil` and response matching regex: /^{\W+swagger/', debug: true do
         expect do |block|
-          @instance.get_info &block
-        end.to yield_with_args(NilClass, /^{[\s\W]+swagger/)
+          @instance.get_info(&block)
+        end.to yield_with_args(NilClass, /^{\W+swagger/)
+      end
+    end
+
+    # TODO: figure out how to create an error scenario
+    context 'with error' do
+      pending '# pending: figure out how wo create an error scenario'
+
+      include_examples '@instance of described class'
+
+      it 'yields with a non-nil error value' do
+        expect do |block|
+          @instance.get_info(&block)
+        end.to yield_with_args()
+      end
+    end
+  end
+
+  describe '#get_buckets' do
+    # TODO: refactor error contexts into shared example group 'api request'
+    context 'without error' do
+      include_examples '@instance of described class'
+
+      it 'yields with an error value of `nil`' do
+        expect do |block|
+          @instance.get_buckets(&block)
+        end.to yield_with_args(NilClass, /^{\W+swagger/)
+      end
+    end
+
+    # TODO: figure out how to create an error scenario
+    context 'with error' do
+      pending '# pending: figure out how wo create an error scenario'
+
+      include_examples '@instance of described class'
+
+      it 'yields with a non-nil error value' do
+        expect do |block|
+          @instance.get_info(&block)
+        end.to yield_with_args()
       end
     end
   end
