@@ -57,7 +57,7 @@ RSpec.describe LibStorj::Env do
       it 'yields with an error value of `nil`' do
         expect do |block|
           @instance.get_buckets(&block)
-        end.to yield_with_args(NilClass, /^{\W+swagger/)
+        end.to yield_with_args(NilClass, /^(\[\s+)?{\W+user/)
       end
     end
 
