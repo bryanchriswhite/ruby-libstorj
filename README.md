@@ -60,12 +60,16 @@ rake
 
 # OR
 # rake build
+# rake build[no-test]   # build without requiring tests to pass
 ```
 
 ### Install gem:
 + with `rake`:
     ```bash
     rake install
+    
+    # OR
+    # rake install[no-test]   # install without requiring tests to pass
     ```
 
 + with `gem`:
@@ -92,7 +96,6 @@ $ rspec --help | less
                          [j]son
                          custom formatter class name
 ```
-_(give "documentation" a try for BDD/TDD or... well, documentation, of course)_
 
 + with `rake`:
     ```bash

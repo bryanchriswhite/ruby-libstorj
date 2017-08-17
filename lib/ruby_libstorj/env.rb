@@ -11,20 +11,20 @@ module LibStorj
 
     def get_info(&block)
       callback = LibStorj::Factory.json_response_callback(&block)
-      reactor_ext_proxy callback, :get_info
+      reactor_ext_proxy callback, ::LibStorj::Ext::Storj, :get_info
     end
 
     def get_buckets(&block)
       callback = LibStorj::Factory.json_response_callback(&block)
-      reactor_ext_proxy callback, :get_buckets
+      reactor_ext_proxy callback, ::LibStorj::Ext::Storj, :get_buckets
     end
 
     private
 
-    def reactor_ext_proxy(callback, method_name)
+    def reactor_ext_proxy(callback, ext_module, method_name)
       reactor do |reactor|
         reactor.work do
-          ::LibStorj::Ext::Storj.send(
+          ext_module.send(
               method_name,
               storj_env_ptr,
               callback,

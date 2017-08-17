@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.email         = ['bryanchriswhite@gmail.com', 'bryan@storj.io']
   gem.homepage      = 'https://github.com/storj/ruby-libstorj'
   gem.summary       = 'libstorj bindings for Ruby'
-  gem.description   = 'libstorj bindings for Ruby' # TODO: elaborate
+  gem.description   = 'Ruby bindings to the libstorj C Storj API library' # TODO: elaborate
 
   # gem.extensions << 'ext/Rakefile'
   # TODO: uncomment if this gem needs to build native extensions

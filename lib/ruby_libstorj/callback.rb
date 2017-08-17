@@ -6,7 +6,7 @@ module LibStorj
       handle
     ]) do |req, error_code, response_pointer, callback|
       response = LibStorj.parse_json(response_pointer)
-      error = if !error_code.nil?
+      error = if !error_code.nil? && (error_code > 0)
                 ::LibStorj::Ext::Curl.easy_stderr(error_code)
               elsif response.nil?
                 'Failed to get info'

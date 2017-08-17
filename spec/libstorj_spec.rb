@@ -1,26 +1,47 @@
 RSpec.describe LibStorj do
   describe '.util_timestamp' do
-    it 'should return the current unix timestamp' do
+    it 'returns the current unix timestamp' do
       actual = LibStorj.util_timestamp
       expected = Time.new.to_f
 
       # / 1000 to convert from int of milliseconds to a float of seconds
-      (actual / 1000).should eq(expected.floor)
-      # timestamp = LibStorj.util_timestamp
-      # LibStorj.mnemonic_check
+      expect(actual / 1000).to eq(expected.floor)
     end
   end
 
   describe '.util_datetime' do
-    it 'should return the current a `DateTime` object with the current time' do
+    it 'returns a `DateTime` object with the correct current time' do
       actual = LibStorj.util_datetime
       expected = DateTime.now.to_time.to_i
 
-      # / 1000 to convert from int of milliseconds to a float of seconds
-      actual.should be_an_instance_of(DateTime)
-      (actual.to_time.to_i).should eq(expected)
-      # timestamp = LibStorj.util_timestamp
-      # LibStorj.mnemonic_check
+      expect(actual).to be_an_instance_of(DateTime)
+      expect(actual.to_time.to_i).to eq(expected)
+    end
+  end
+
+  describe '.mnemonic_check' do
+    before do
+      @valid_mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+      @invalid_mnemonic = 'nope'
+    end
+
+    context 'with a valid mnenonic' do
+
+      it 'returns true' do
+        actual = described_class.mnemonic_check @valid_mnemonic
+        expected = DateTime.now.to_time.to_i
+
+        expect(actual).to be(true)
+      end
+    end
+
+    context 'with an invalid mnenonic' do
+      it 'returns false' do
+        actual = described_class.mnemonic_check @invalid_mnemonic
+        expected = DateTime.now.to_time.to_i
+
+        expect(actual).to be(false)
+      end
     end
   end
 end

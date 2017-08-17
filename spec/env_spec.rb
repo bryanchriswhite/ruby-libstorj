@@ -1,21 +1,38 @@
 require_relative './helpers/storj_options'
+include LibStorjTest
 
-RSpec.describe LibStorj::Env, 'new' do
-  context 'creating' do
-    before do
-      begin
-        @storj_env = described_class.new(*default_options)
-      rescue => error
-        fail(error)
-      end
+RSpec.shared_examples '@instance of described class' do
+  before do
+    begin
+      @instance = described_class.new(*default_options)
+    rescue => error
+      fail(error)
     end
+  end
+end
 
-    it 'should not segfault' do
+RSpec.describe LibStorj::Env do
+  describe 'new' do
+    include_examples '@instance of described class'
+
+    it 'doesn\'t segfault' do
       # pass
     end
 
-    it 'should return an instans of LibStorj::Env' do
-      @storj_env.should be_an_instance_of(described_class)
+    it 'returns an instant of LibStorj::Env' do
+      expect(@instance).to be_an_instance_of(described_class)
+    end
+  end
+
+  describe '#get_info' do
+    context 'no error' do
+      include_examples '@instance of described class'
+
+      it 'should yield with an error value of `nil`' do
+        expect do |block|
+          @instance.get_info &block
+        end.to yield_with_args(NilClass, /^{[\s\W]+swagger/)
+      end
     end
   end
 end

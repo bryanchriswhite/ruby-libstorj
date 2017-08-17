@@ -12,6 +12,8 @@
 # the additional setup, and require it from the spec files that actually need
 # it.
 
+# use local file rather than require gem to test local code
+# i.e. `require 'ruby_libstorj'`
 require_relative '../lib/../lib/ruby_libstorj/libstorj'
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
@@ -29,8 +31,8 @@ RSpec.configure do |config|
     #     # => "be bigger than 2"
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
 
-    # switch to :should instead of :expect
-    expectations.syntax = :should
+    # uncomment to switch to :should instead of :expect
+    # expectations.syntax = :should
   end
 
   # rspec-mocks config goes here. You can use an alternate test double
