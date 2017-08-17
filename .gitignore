@@ -5,4 +5,4 @@
 *.a
 *.log
 tmp/*
-test/options.yml
+spec/helpers/options.yml
