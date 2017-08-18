@@ -1,9 +1,10 @@
 module LibStorj
   class Env
     require 'libuv'
+    attr_reader :pointer
 
-    attr_reader :storj_env_ptr
-
+    C_ANALOGUE = ::LibStorj::Ext::Storj::Env
+    JSON_C_CAST_METHOD = ::LibStorj::Ext::JsonC.method :parse_json
     CURL_ERROR_CODE_CAST_PROC = Proc.new do |error_code|
       next nil if error_code.nil?
 
@@ -11,11 +12,9 @@ module LibStorj
       error_code > 0 ? curl_error : nil
     end
 
-    JSON_C_CAST_METHOD = ::LibStorj::Ext::JsonC.method :parse_json
-
     def initialize(*options)
-      @storj_env_ptr = ::LibStorj::Ext::Storj.method(:init_env).call(*options)
-      @storj_env_ptr[:loop] = ::Libuv::Ext.default_loop
+      @pointer = ::LibStorj::Ext::Storj.method(:init_env).call(*options)
+      @pointer[:loop] = ::Libuv::Ext.default_loop
     end
 
     def get_info(&block)
@@ -39,7 +38,7 @@ module LibStorj
 
       reactor do |reactor|
         reactor.work do
-          ::LibStorj::Ext::Storj.get_info @storj_env_ptr, handle, after_work_cb
+          ::LibStorj::Ext::Storj.get_info @pointer, handle, after_work_cb
         end
       end
     end
@@ -66,7 +65,7 @@ module LibStorj
 
       reactor do |reactor|
         reactor.work do
-          ::LibStorj::Ext::Storj.get_buckets @storj_env_ptr, work_cb, after_work_cb
+          ::LibStorj::Ext::Storj.get_buckets @pointer, work_cb, after_work_cb
         end
       end
     end

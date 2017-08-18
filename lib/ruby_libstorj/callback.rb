@@ -54,14 +54,5 @@ module LibStorj
 
       @pointer = FFI::Function.new(ffi_return, ffi_args, wrapped_block)
     end
-
-    def call(*args)
-      # TODO: better error handling
-      # begin
-      @pointer.call(*args)
-      # rescue => e
-      #   # throw e
-      # end
-    end
   end
 end

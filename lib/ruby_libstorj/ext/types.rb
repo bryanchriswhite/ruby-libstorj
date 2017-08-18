@@ -90,10 +90,10 @@ module LibStorj
       end
 
       class Env < FFI::Struct
-        layout :storj_bridge_options, BridgeOptions.ptr,
-               :storj_encrypt_options, EncryptOptions.ptr,
-               :storj_http_options, HttpOptions.ptr,
-               :storj_log_options, LogOptions.ptr,
+        layout :bridge_options, BridgeOptions.ptr,
+               :encrypt_options, EncryptOptions.ptr,
+               :http_options, HttpOptions.ptr,
+               :log_options, LogOptions.ptr,
                :tmp_path, :pointer,
                :loop, :pointer, # uv_loop_t*
                :log, :pointer # storj_log_levels_t*

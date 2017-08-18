@@ -19,8 +19,20 @@ RSpec.describe LibStorj::Env do
       # pass
     end
 
-    it 'returns an instant of LibStorj::Env' do
+    it 'returns an instance of the described class' do
       expect(@instance).to be_an_instance_of(described_class)
+    end
+  end
+
+  describe '@pointer' do
+    include_examples '@instance of described class'
+
+    it 'does not point to NULL' do
+      expect(@instance.pointer).not_to equal(FFI::Pointer::NULL)
+    end
+
+    it 'is an instance of the struct wrapper corresponding to its C analogue' do
+      expect(@instance.pointer).to be_an_instance_of(described_class::C_ANALOGUE)
     end
   end
 
@@ -28,23 +40,22 @@ RSpec.describe LibStorj::Env do
     context 'without error' do
       include_examples '@instance of described class'
 
-      it 'yields with an error value of `nil` and response matching regex: /^{\W+swagger/', debug: true do
+      it 'yields with an error value of `nil` and response matching regex: /^{\W+swagger/' do
         expect do |block|
           @instance.get_info(&block)
         end.to yield_with_args(NilClass, /^{\W+swagger/)
       end
     end
 
-    # TODO: figure out how to create an error scenario
     context 'with error' do
-      pending '# pending: figure out how wo create an error scenario'
-
       include_examples '@instance of described class'
 
       it 'yields with a non-nil error value' do
+        @instance.pointer[:bridge_options][:host].write_string 'a.nonexistant.example'
+
         expect do |block|
           @instance.get_info(&block)
-        end.to yield_with_args()
+        end.to yield_with_args(/couldn't resolve host name/i, 'null')
       end
     end
   end
@@ -61,16 +72,15 @@ RSpec.describe LibStorj::Env do
       end
     end
 
-    # TODO: figure out how to create an error scenario
     context 'with error' do
-      pending '# pending: figure out how wo create an error scenario'
-
       include_examples '@instance of described class'
 
       it 'yields with a non-nil error value' do
+        @instance.pointer[:bridge_options][:host].write_string 'a.nonexistant.example'
+
         expect do |block|
           @instance.get_info(&block)
-        end.to yield_with_args()
+        end.to yield_with_args(/couldn't resolve host name/i, 'null')
       end
     end
   end
