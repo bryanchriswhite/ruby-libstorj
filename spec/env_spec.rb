@@ -9,6 +9,12 @@ RSpec.shared_examples '@instance of described class' do
       fail(error)
     end
   end
+
+  after do
+    # (see https://github.com/Storj/ruby-libstorj/issues/2)
+    # Process.RLIMIT_MEMLOCKA #=> 8
+    @instance.destroy
+  end
 end
 
 RSpec.describe LibStorj::Env, extra_broken: true do

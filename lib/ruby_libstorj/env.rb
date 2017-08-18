@@ -20,6 +20,10 @@ module LibStorj
       @storj_env[:loop] = ::Libuv::Ext.default_loop
     end
 
+    def destroy
+      ::LibStorj::Ext::Storj.destroy_env @storj_env
+    end
+
     def get_info(&block)
       handle_cast_proc = Proc.new do |handle|
         FFI::Function.new :void, %i[string string], handle
