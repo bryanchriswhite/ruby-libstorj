@@ -11,15 +11,15 @@ RSpec.shared_examples '@instance of described class' do
   end
 end
 
-RSpec.describe LibStorj::Env do
+RSpec.describe LibStorj::Env, extra_broken: true do
   describe 'new' do
     include_examples '@instance of described class'
 
-    it 'doesn\'t segfault' do
+    it 'doesn\'t segfault', working: true, broken: true do
       # pass
     end
 
-    it 'returns an instance of the described class' do
+    it 'returns an instance of the described class', working: true, broken: true do
       expect(@instance).to be_an_instance_of(described_class)
     end
   end
@@ -27,12 +27,12 @@ RSpec.describe LibStorj::Env do
   describe '@pointer' do
     include_examples '@instance of described class'
 
-    it 'does not point to NULL' do
-      expect(@instance.pointer).not_to equal(FFI::Pointer::NULL)
+    it 'does not point to NULL', working: true, broken: true do
+      expect(@instance.storj_env.to_ptr).not_to equal(FFI::Pointer::NULL)
     end
 
-    it 'is an instance of the struct wrapper corresponding to its C analogue' do
-      expect(@instance.pointer).to be_an_instance_of(described_class::C_ANALOGUE)
+    it 'is an instance of the struct wrapper corresponding to its C analogue', working: true, broken: true do
+      expect(@instance.storj_env).to be_an_instance_of(described_class::C_ANALOGUE)
     end
   end
 
@@ -40,7 +40,7 @@ RSpec.describe LibStorj::Env do
     context 'without error' do
       include_examples '@instance of described class'
 
-      it 'yields with an error value of `nil` and response matching regex: /^{\W+swagger/' do
+      it 'yields with an error value of `nil` and response matching regex: /^{\W+swagger/', working: true, broken: true do
         expect do |block|
           @instance.get_info(&block)
         end.to yield_with_args(NilClass, /^{\W+swagger/)
@@ -50,8 +50,8 @@ RSpec.describe LibStorj::Env do
     context 'with error' do
       include_examples '@instance of described class'
 
-      it 'yields with a non-nil error value' do
-        @instance.pointer[:bridge_options][:host].write_string 'a.nonexistant.example'
+      it 'yields with a non-nil error value and "null" response', working: true, broken: true do
+        @instance.storj_env[:bridge_options][:host].write_string 'a.nonexistant.example'
 
         expect do |block|
           @instance.get_info(&block)
@@ -65,23 +65,55 @@ RSpec.describe LibStorj::Env do
     context 'without error' do
       include_examples '@instance of described class'
 
-      it 'yields with an error value of `nil`' do
+      it 'yields a string response and a nil error', working: true, broken: true do
         expect do |block|
           @instance.get_buckets(&block)
-        end.to yield_with_args(NilClass, /^(\[\s+)?{\W+user/)
+        end.to yield_with_args(NilClass, String)
+      end
+
+      it 'yields a response containing a JSON array of buckets with `name`s,', working: false, broken: true do
+        require 'json'
+
+        @instance.get_buckets do |error, response|
+          buckets = JSON.parse response
+          are_all_named = buckets.reject {|bucket| bucket[:name].nil?}.empty?
+
+          expect(are_all_named).to be(true)
+        end
       end
     end
 
     context 'with error' do
-      include_examples '@instance of described class'
+      # include_examples '@instance of described class'
 
-      it 'yields with a non-nil error value' do
-        @instance.pointer[:bridge_options][:host].write_string 'a.nonexistant.example'
+      it 'yields with a non-nil error value and "null" response', working: true, broken: true do
+        ballz = LibStorj::Env.new(*default_options)
+        # (see https://tools.ietf.org/html/rfc2606)
+        ballz.storj_env[:bridge_options][:host].write_string 'a.nonexistant.example'
 
         expect do |block|
-          @instance.get_info(&block)
+          ballz.get_buckets(&block)
         end.to yield_with_args(/couldn't resolve host name/i, 'null')
       end
     end
+
+    context 'after about 9 instances' do
+      # include_examples '@instance of described class'
+      it 'blows up' do
+        boom = LibStorj::Env.new(*default_options)
+      end
+    end
+
+    context '...' do
+      # include_examples '@instance of described class'
+
+      it 'blows up' do
+        boom = LibStorj::Env.new(*default_options)
+      end
+    end
+
+    # context 'with invalid credentials' do
+    #
+    # end
   end
 end
