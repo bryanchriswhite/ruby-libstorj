@@ -21,11 +21,11 @@ RSpec.describe LibStorj::Env, extra_broken: true do
   describe 'new' do
     include_examples '@instance of described class'
 
-    it 'doesn\'t segfault', working: true, broken: true do
+    it 'doesn\'t segfault' do
       # pass
     end
 
-    it 'returns an instance of the described class', working: true, broken: true do
+    it 'returns an instance of the described class' do
       expect(@instance).to be_an_instance_of(described_class)
     end
   end
@@ -33,11 +33,11 @@ RSpec.describe LibStorj::Env, extra_broken: true do
   describe '@pointer' do
     include_examples '@instance of described class'
 
-    it 'does not point to NULL', working: true, broken: true do
+    it 'does not point to NULL' do
       expect(@instance.storj_env.to_ptr).not_to equal(FFI::Pointer::NULL)
     end
 
-    it 'is an instance of the struct wrapper corresponding to its C analogue', working: true, broken: true do
+    it 'is an instance of the struct wrapper corresponding to its C analogue' do
       expect(@instance.storj_env).to be_an_instance_of(described_class::C_ANALOGUE)
     end
   end
@@ -46,7 +46,7 @@ RSpec.describe LibStorj::Env, extra_broken: true do
     context 'without error' do
       include_examples '@instance of described class'
 
-      it 'yields with an error value of `nil` and response matching regex: /^{\W+swagger/', working: true, broken: true do
+      it 'yields with an error value of `nil` and response matching regex: /^{\W+swagger/' do
         expect do |block|
           @instance.get_info(&block)
         end.to yield_with_args(NilClass, /^{\W+swagger/)
@@ -56,7 +56,7 @@ RSpec.describe LibStorj::Env, extra_broken: true do
     context 'with error' do
       include_examples '@instance of described class'
 
-      it 'yields with a non-nil error value and "null" response', working: true, broken: true do
+      it 'yields with a non-nil error value and "null" response' do
         @instance.storj_env[:bridge_options][:host].write_string 'a.nonexistant.example'
 
         expect do |block|
@@ -71,13 +71,13 @@ RSpec.describe LibStorj::Env, extra_broken: true do
     context 'without error' do
       include_examples '@instance of described class'
 
-      it 'yields a string response and a nil error', working: true, broken: true do
+      it 'yields a string response and a nil error' do
         expect do |block|
           @instance.get_buckets(&block)
         end.to yield_with_args(NilClass, String)
       end
 
-      it 'yields a response containing a JSON array of buckets with `name`s,', working: false, broken: true do
+      it 'yields a response containing a JSON array of buckets with `name`s' do
         require 'json'
 
         @instance.get_buckets do |error, response|
@@ -90,31 +90,15 @@ RSpec.describe LibStorj::Env, extra_broken: true do
     end
 
     context 'with error' do
-      # include_examples '@instance of described class'
+      include_examples '@instance of described class'
 
-      it 'yields with a non-nil error value and "null" response', working: true, broken: true do
-        ballz = LibStorj::Env.new(*default_options)
+      it 'yields with a non-nil error value and "null" response' do
         # (see https://tools.ietf.org/html/rfc2606)
-        ballz.storj_env[:bridge_options][:host].write_string 'a.nonexistant.example'
+        @instance.storj_env[:bridge_options][:host].write_string 'a.nonexistant.example'
 
         expect do |block|
-          ballz.get_buckets(&block)
+          @instance.get_buckets(&block)
         end.to yield_with_args(/couldn't resolve host name/i, 'null')
-      end
-    end
-
-    context 'after about 9 instances' do
-      # include_examples '@instance of described class'
-      it 'blows up' do
-        boom = LibStorj::Env.new(*default_options)
-      end
-    end
-
-    context '...' do
-      # include_examples '@instance of described class'
-
-      it 'blows up' do
-        boom = LibStorj::Env.new(*default_options)
       end
     end
 
