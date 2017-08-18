@@ -1,7 +1,15 @@
 #include <string.h>
 #include <storj.h>
+//#include <ffi/MemoryPointer.h>
+#include "rice/Class.hpp"
 
 using namespace std;
+
+extern "C"
+void mnemonic_generate_proxy(int strength, char* buffer) {
+
+    char* mnemonic = storj_mnemonic_generate(strength, )
+}
 
 extern "C"
 void Init_ruby_libstorj(void) {
