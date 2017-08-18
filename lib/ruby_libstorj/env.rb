@@ -14,9 +14,6 @@ module LibStorj
 
     def initialize(*options)
       @storj_env = ::LibStorj::Ext::Storj.method(:init_env).call(*options)
-      puts "@storj_env: #{@storj_env}"
-      puts "@storj_env.to_ptr: #{@storj_env.to_ptr}"
-      puts "@storj_env.to_ptr.address.to_s(16): #{@storj_env.to_ptr.address.to_s(16)}"
       @storj_env[:loop] = ::Libuv::Ext.default_loop
     end
 
