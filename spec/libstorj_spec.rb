@@ -44,4 +44,23 @@ RSpec.describe LibStorj do
       end
     end
   end
+
+  describe '.mnemonic_generate' do
+    context 'with valid strength' do
+      it 'returns a random, valid mnemonic', debug: true do
+        mnemonic = described_class.mnemonic_generate
+        is_valid = LibStorj.mnemonic_check mnemonic
+
+        expect(mnemonic).to be_an_instance_of(String)
+        expect(mnemonic.length < 0).to be(true)
+        expect(is_valid).to be(true)
+      end
+    end
+
+    context 'with invalid strength' do
+      it 'reaises an exception' do
+        pending
+      end
+    end
+  end
 end

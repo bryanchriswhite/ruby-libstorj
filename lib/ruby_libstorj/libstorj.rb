@@ -31,6 +31,25 @@ module LibStorj
     end
   end
 
+  # default to highest strength; strength range: (128..256)
+  def self.mnemonic_generate(strength = 256)
+    # buffer = FFI::Buffer.new(32)
+    # require 'pry'
+    # binding.pry
+    # buffer = FFI::MemoryPointer.new :char, 32
+    # buffer_pointer = FFI::MemoryPointer.new :pointer
+    # buffer_pointer.write_bytes buffer.address
+    buffer = FFI::MemoryPointer.new :string
+    buffer_pointer = FFI::MemoryPointer.new :pointer
+    # ::LibStorj::Ext::
+
+    ::LibStorj::Ext::Storj.mnemonic_generate(strength, pointer)
+    # buffer.read_array
+    # buffer.read_array_of_type(...)
+    # buffer
+    buffer.read_string
+  end
+
   require 'ruby_libstorj/factory.rb'
   require 'ruby_libstorj/callback.rb'
 end

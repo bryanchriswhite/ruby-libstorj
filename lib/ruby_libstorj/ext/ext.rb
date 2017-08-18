@@ -18,6 +18,8 @@ module LibStorj
       extend FFI::Library
       ffi_lib('storj')
 
+      attach_function('mnemonic_generate', 'storj_mnemonic_check', [:int, :pointer], :int)
+
       attach_function('get_info', 'storj_bridge_get_info', [
           Env.ptr,
           JSON_REQUEST_CALLBACK,
