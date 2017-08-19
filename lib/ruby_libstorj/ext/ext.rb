@@ -32,6 +32,10 @@ module LibStorj
       # ::LibStorj::UV::
       ], :int)
 
+      attach_function('destroy_env', 'storj_destroy_env', [
+          Env.ptr
+      ], :int)
+
       attach_function('init_env', 'storj_init_env', [
           BridgeOptions.ptr,
           EncryptOptions.ptr,
