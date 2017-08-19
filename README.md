@@ -81,8 +81,18 @@ rake
     ```
 
 ### Run tests:
+#### First create spec/helpers/options.yml !
+For the moment the test suite doesn't start it's own mock backend but it does parse whatever's in the `spec/helpsers/options.yml` file to initialize `LibStorj::Ext::Storj::Env` accordingly.
+
+You can copy [`spec/helpers/options.yml.example`](./spec/helpers/options.yml.example) and modify it for your use:
+```bash
+cp spec/helpers/options.yml.example spec/helpers/options.yml && \
+vim spec/helpers/options.yml   # or whatever
+```
+`spec/helpers/options.yml` should be in the [`.gitignore`](./.gitignore) so you shouldn't have to worry about accidentally committing it.
+
 #### A quick note on rspec formatters:
-The "progress" (aka "dots") formatter is the default but it's not my peronsal favorite for development.
+The "progress" formatter is the default.
 This repo makes it easy to change formatters when invoking rspec via `rspec` or `rake` binaries.
 
 With that said, here are your options:
@@ -110,7 +120,7 @@ $ rspec --help | less
     # rake spec[d]
     ```
     
-    Keep in mind that rake will also run any dependencies of the `:test` task
+    Keep in mind that rake will also run any dependencies of the `:test` (or `:spec`) task
     
     _(e.g. Start a web server or db server or something)_
 + with `rspec`:
@@ -152,18 +162,19 @@ $ rspec --help | less
    ```c
    /* example.c */
    #include <uv.h>
-   
-   
+   ...
+   // implemented elsewhere
+   uv_work_t* my_work_factory(void* handle);
+   ...
+   handle_wrapper
    ...
    extern "C"
    int example_queue_work(void* handle, uv_after_work_cb cb)
    {
-       # example modified from storj_bridge_get_info
        uv_loop_t* loop = &uv_default_loop();
-       uv_work_t *work = json_request_work_new(env,"GET", "/", NULL,
-                                               false, handle);
+       uv_work_t *work = my_work_factory(handle);
    
-       return uv_queue_work(loop, (uv_work_t*) work, json_request_worker, cb);
+       return uv_queue_work(loop, work, my_worker, cb);
    }
    ```
     
