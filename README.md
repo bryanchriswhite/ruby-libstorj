@@ -42,6 +42,9 @@ This project strives to conform to the ruby  and rubygems standards and conventi
   - task runner
 + `rspec` (see http://rspec.info/documentation/)
   - test framework
++ `guard` (see https://github.com/guard/guard)
+  - task automation
+    - rspec - file watching
 
 ### Install ruby dependencies:
 ```bash
@@ -171,7 +174,7 @@ $ rspec --help | less
    extern "C"
    int example_queue_work(void* handle, uv_after_work_cb cb)
    {
-       uv_loop_t* loop = &uv_default_loop();
+       uv_loop_t* loop = uv_default_loop();
        uv_work_t *work = my_work_factory(handle);
    
        return uv_queue_work(loop, work, my_worker, cb);
@@ -204,6 +207,10 @@ $ rspec --help | less
    Example.run  #=> segmentation fault
    ```
    _*`ffi_lib` automatically adds the conventional "lib" prefix to args which are not absolute paths_
+   
+   
+   It seems to be the case that calls to `uv_default_loop()` made from within C-libstorj point to a different location than the default loop from ruby-livub.
+   It may be the case that C-libuv is being loaded twice, one linked through C-libstorj and the other through ruby-libuv bindings or something; more digging required.
    
    #### The solution
    Instead of calling `uv_run` directly, if we let the ruby `libuv` gem do it for us, we can call `uv_queue_work` in C as much as we want.
