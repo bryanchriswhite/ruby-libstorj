@@ -1,7 +1,7 @@
 module LibStorj
   class Env
     require 'libuv'
-    attr_reader :pointer
+    attr_reader :storj_env
 
     C_ANALOGUE = ::LibStorj::Ext::Storj::Env
     JSON_C_CAST_METHOD = ::LibStorj::Ext::JsonC.method :parse_json
@@ -13,8 +13,12 @@ module LibStorj
     end
 
     def initialize(*options)
-      @pointer = ::LibStorj::Ext::Storj.method(:init_env).call(*options)
-      @pointer[:loop] = ::Libuv::Ext.default_loop
+      @storj_env = ::LibStorj::Ext::Storj.method(:init_env).call(*options)
+      @storj_env[:loop] = ::Libuv::Ext.default_loop
+    end
+
+    def destroy
+      ::LibStorj::Ext::Storj.destroy_env @storj_env
     end
 
     def get_info(&block)
@@ -38,7 +42,7 @@ module LibStorj
 
       reactor do |reactor|
         reactor.work do
-          ::LibStorj::Ext::Storj.get_info @pointer, handle, after_work_cb
+          ::LibStorj::Ext::Storj.get_info @storj_env, handle, after_work_cb
         end
       end
     end
@@ -65,7 +69,7 @@ module LibStorj
 
       reactor do |reactor|
         reactor.work do
-          ::LibStorj::Ext::Storj.get_buckets @pointer, work_cb, after_work_cb
+          ::LibStorj::Ext::Storj.get_buckets @storj_env, work_cb, after_work_cb
         end
       end
     end
