@@ -1,4 +1,4 @@
-require_relative './helpers/storj_options'
+require_relative '../helpers/storj_options'
 include LibStorjTest
 
 RSpec.shared_examples '@instance of described class' do

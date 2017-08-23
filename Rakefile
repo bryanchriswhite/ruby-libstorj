@@ -25,7 +25,7 @@ begin
     t.rspec_opts = rspec_opts unless rspec_opts.empty?
   end
 
-  LibStorj::ArgForwardingTask.new(:spec, task_aliases: %i[test], args_deps_hash: {
+  LibStorj::ArgForwardingTask.new(:spec, alias_names: %i[test], args_deps_hash: {
       %i[format] => []
   })
 rescue LoadError
@@ -39,7 +39,7 @@ Rake::ExtensionTask.new 'ruby_libstorj'
 # TODO: everything that follows... but better
 LibStorj::ArgForwardingTask.new(:build, args_deps_hash: {
     %i[no-test] => []
-}) do |t, args|
+}) do |t, args, deps|
   Rake::Task[:spec].invoke if args.to_hash[:'no-test'].nil?
 
   directory 'tmp'
