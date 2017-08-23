@@ -6,14 +6,14 @@ ruby-libstorj: Ruby bindings for libstorj
 ### Install gem:
 + in `Gemfile`:
     ```ruby
-    gem 'ruby_libstorj'
+    gem 'ruby-libstorj'
     ```
     
     followed by a `bundle install` (of course)
     
 + with `gem`:
     ```bash
-      gem install ruby_libstorj
+      gem install ruby-libstorj
     ```
     
 + from source:
@@ -80,7 +80,7 @@ rake
     Maybe you need/want to pass args to `gem`, or maybe `rake install` doesn't work on your system:
     
     ```bash
-    gem install --local ./ruby_libstorj-*.gem  --no-ri --no-rdoc  
+    gem install --local ./ruby-libstorj-*.gem  --no-ri --no-rdoc  
     ```
 
 ### Run tests:

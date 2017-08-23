@@ -13,8 +13,8 @@
 # it.
 
 # use local file rather than require gem to test local code
-# i.e. `require 'ruby_libstorj'`
-require_relative '../lib/ruby_libstorj/libstorj'
+# i.e. `require 'ruby-libstorj'`
+require_relative '../lib/ruby-libstorj/libstorj'
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|

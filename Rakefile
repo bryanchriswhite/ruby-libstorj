@@ -1,6 +1,6 @@
 # use local file rather than require through gem to run local code
-# i.e. `require 'ruby_libstorj/...'`
-require_relative './lib/ruby_libstorj/arg_forwarding_task'
+# i.e. `require 'ruby-libstorj/...'`
+require_relative './lib/ruby-libstorj/arg_forwarding_task'
 
 # NB: using begin/rescue so that you can use your
 #     Rakefile in an environment where RSpec is
@@ -34,7 +34,7 @@ end
 
 # Register the task that's run when you `rake compile`
 require 'rake/extensiontask'
-Rake::ExtensionTask.new 'ruby_libstorj'
+Rake::ExtensionTask.new 'ruby-libstorj'
 
 # TODO: everything that follows... but better
 LibStorj::ArgForwardingTask.new(:build, args_deps_hash: {
@@ -44,8 +44,8 @@ LibStorj::ArgForwardingTask.new(:build, args_deps_hash: {
 
   directory 'tmp'
 
-  sh 'gem build ./ruby_libstorj.gemspec'
-  sh 'mv ./ruby_libstorj-*.gem ./tmp/'
+  sh 'gem build ./ruby-libstorj.gemspec'
+  sh 'mv ./ruby-libstorj-*.gem ./tmp/'
 end
 
 LibStorj::ArgForwardingTask.new(:install, args_deps_hash: {
@@ -53,7 +53,7 @@ LibStorj::ArgForwardingTask.new(:install, args_deps_hash: {
 }) do |t, args|
   Rake::Task[:build].invoke(*args.to_a)
 
-  sh 'gem install --local ./tmp/ruby_libstorj-*.gem \
+  sh 'gem install --local ./tmp/ruby-libstorj-*.gem \
                         --no-ri \
                         --no-rdoc'
 end

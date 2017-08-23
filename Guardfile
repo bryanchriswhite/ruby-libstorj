@@ -17,5 +17,5 @@
 
 guard 'rake', task: 'test', task_args: %i[format paths] do
   watch('Rakefile')
-  watch(%r{^lib/ruby_libstorj/callback.rb$})
+  watch(%r{^lib/ruby-libstorj/callback.rb$})
 end

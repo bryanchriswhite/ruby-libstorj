@@ -17,7 +17,7 @@ module LibStorj
     module Curl
       extend FFI::Library
 
-      require 'ruby_libstorj/ext/curl_code'
+      require 'ruby-libstorj/ext/curl_code'
 
       enum(:curl_code, CURL_CODES)
     end

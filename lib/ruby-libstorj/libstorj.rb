@@ -3,12 +3,12 @@ require 'ffi'
 require 'date'
 
 module LibStorj
-  require 'ruby_libstorj/struct'
-  require 'ruby_libstorj/ext/types'
-  require 'ruby_libstorj/ext/ext'
+  require 'ruby-libstorj/struct'
+  require 'ruby-libstorj/ext/types'
+  require 'ruby-libstorj/ext/ext'
 
-  require 'ruby_libstorj/env'
-  require 'ruby_libstorj/mixins/storj'
+  require 'ruby-libstorj/env'
+  require 'ruby-libstorj/mixins/storj'
 
   extend ::LibStorj::Ext::Storj::Mixins
 
@@ -31,6 +31,6 @@ module LibStorj
     end
   end
 
-  require 'ruby_libstorj/factory.rb'
-  require 'ruby_libstorj/callback.rb'
+  require 'ruby-libstorj/factory.rb'
+  require 'ruby-libstorj/callback.rb'
 end

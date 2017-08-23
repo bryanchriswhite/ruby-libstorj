@@ -3,7 +3,7 @@
 # require File.expand_path("../lib/ruby-libstorj/version", __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.name          = 'ruby_libstorj'
+  gem.name          = 'ruby-libstorj'
   gem.version       = '0.0.0' #LibStorj::VERSION
   gem.license       = 'AGPL-3.0'
   gem.authors       = ['Bryan White']
@@ -14,7 +14,7 @@ Gem::Specification.new do |gem|
 
   # gem.extensions << 'ext/Rakefile'
   # TODO: uncomment if this gem needs to build native extensions
-  gem.extensions = %w[ext/ruby_libstorj/extconf.rb]
+  gem.extensions = %w[ext/ruby-libstorj/extconf.rb]
 
   gem.required_ruby_version = '>= 2.0.0'
   gem.require_paths = ['lib']

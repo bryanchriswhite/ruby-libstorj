@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ruby_libstorj (0.0.0)
+    ruby-libstorj (0.0.0)
 
 GEM
   remote: https://rubygems.org/
@@ -88,7 +88,7 @@ DEPENDENCIES
   rake!
   rake-compiler!
   rspec!
-  ruby_libstorj!
+  ruby-libstorj!
 
 BUNDLED WITH
    1.15.3

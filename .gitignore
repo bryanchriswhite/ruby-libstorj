@@ -6,3 +6,4 @@
 *.log
 tmp/*
 spec/helpers/options.yml
+Makefile

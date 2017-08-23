@@ -1,6 +1,6 @@
 require 'rake'
 require_relative '../helpers/shared_rake_examples'
-require_relative '../../lib/ruby_libstorj/arg_forwarding_task'
+require_relative '../../lib/ruby-libstorj/arg_forwarding_task'
 
 RSpec.describe LibStorj::ArgForwardingTask do
   let(:instantiate) do
