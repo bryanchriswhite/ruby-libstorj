@@ -3,6 +3,12 @@ require_relative '../helpers/shared_rake_examples'
 require_relative '../../lib/ruby_libstorj/arg_forwarding_task'
 
 RSpec.describe LibStorj::ArgForwardingTask do
+  let(:instantiate) do
+    described_class.new task_name,
+                        alias_names: alias_names,
+                        args_deps_hash: {args => deps},
+                        &task_block
+  end
   describe 'example_task' do
     let(:task_name) {:example_task}
 

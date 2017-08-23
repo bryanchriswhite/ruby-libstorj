@@ -9,11 +9,7 @@ end
 
 shared_examples 'defines the target task' do
   it 'defines the target task' do
-    task = described_class.new task_name,
-                               alias_names: alias_names,
-                               args_deps_hash: {args => deps},
-                               &task_block
-
+    task = instantiate
     begin
       registered_task = ::Rake::Task[task_name]
       expect(registered_task).to be_equal(task.target_task)
@@ -25,11 +21,7 @@ end
 
 shared_context 'invokes all dependencies when invoked' do
   it 'invokes all depencencies when invoked' do
-    task = described_class.new task_name,
-                               alias_names: alias_names,
-                               args_deps_hash: {args => deps},
-                               &task_block
-
+    task = instantiate
     deps.each do |dep_name|
       begin
         dep_task = ::Rake::Task[dep_name]
@@ -48,11 +40,7 @@ end
 
 shared_context 'invokes all dependencies when invoked via any alias' do
   it 'invokes all depencencies when invoked via any alias' do
-    task = described_class.new task_name,
-                               alias_names: alias_names,
-                               args_deps_hash: {args => deps},
-                               &task_block
-
+    task = instantiate
     alias_names.map(&method(:lookup_task)).each do |alias_task|
       alias_task.invoke(*expected_args.values)
 
@@ -98,11 +86,7 @@ end
 
 shared_examples 'gets invoked via any alias' do
   it 'gets invoked via any alias' do
-    task = described_class.new task_name,
-                               alias_names: alias_names,
-                               args_deps_hash: {args => deps},
-                               &task_block
-
+    task = instantiate
     alias_names.each do |alias_name|
       begin
         alias_task = ::Rake::Task[alias_name]
@@ -142,10 +126,7 @@ end
 shared_context 'raises `ArgumentError`' do
   it 'raises an `ArgumentError`' do
     expect do
-      described_class.new task_name,
-                          alias_names: alias_names,
-                          args_deps_hash: {args => deps},
-                          &task_block
+      instantiate
     end.to raise_error(ArgumentError)
   end
 end
