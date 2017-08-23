@@ -9,6 +9,7 @@ RSpec.describe LibStorj::ArgForwardingTask do
                         args_deps_hash: {args => deps},
                         &task_block
   end
+
   describe 'example_task' do
     let(:task_name) {:example_task}
 
