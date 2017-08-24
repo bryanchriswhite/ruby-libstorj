@@ -1,34 +1,24 @@
 require_relative '../helpers/storj_options'
 include LibStorjTest
 
-RSpec.shared_examples 'instance of described class' do
+RSpec.describe LibStorj::Env, extra_broken: true do
   let(:instance) do
     described_class.new(*default_options)
   end
 
-  after do
+  after :each do
     # (see https://github.com/Storj/ruby-libstorj/issues/2)
     # Process.RLIMIT_MEMLOCK #=> 8
     instance.destroy
   end
-end
 
-RSpec.describe LibStorj::Env, extra_broken: true do
   describe 'new' do
-    include_examples 'instance of described class'
-
-    it 'doesn\'t segfault' do
-      # pass
-    end
-
     it 'returns an instance of the described class' do
       expect(instance).to be_an_instance_of(described_class)
     end
   end
 
-  describe '@pointer' do
-    include_examples 'instance of described class'
-
+  describe '@storj_env' do
     it 'does not point to NULL' do
       expect(instance.storj_env.to_ptr).not_to equal(FFI::Pointer::NULL)
     end
@@ -40,24 +30,20 @@ RSpec.describe LibStorj::Env, extra_broken: true do
 
   describe '#get_info' do
     context 'without error' do
-      include_examples 'instance of described class'
-
-      it 'yields with an error value of `nil` and response matching regex: /^{\W+swagger/' do
+      it 'yields with an nil error and hash response' do
         expect do |block|
           instance.get_info(&block)
-        end.to yield_with_args(NilClass, /^{\W+swagger/)
+        end.to yield_with_args(NilClass, Hash)
       end
     end
 
     context 'with error' do
-      include_examples 'instance of described class'
-
-      it 'yields with a non-nil error value and "null" response' do
+      it 'yields with an error and nil response' do
         instance.storj_env[:bridge_options][:host].write_string 'a.nonexistant.example'
 
         expect do |block|
           instance.get_info(&block)
-        end.to yield_with_args(/couldn't resolve host name/i, 'null')
+        end.to yield_with_args(/couldn't resolve host name/i, nil)
       end
     end
   end
@@ -65,19 +51,14 @@ RSpec.describe LibStorj::Env, extra_broken: true do
   describe '#get_buckets' do
     # TODO: refactor error contexts into shared example group 'api request'
     context 'without error' do
-      include_examples 'instance of described class'
-
-      it 'yields a string response and a nil error' do
+      it 'yields a nil error and an array of buckets' do
         expect do |block|
           instance.get_buckets(&block)
-        end.to yield_with_args(NilClass, String)
+        end.to yield_with_args(NilClass, Array)
       end
 
-      it 'yields a response containing a JSON array of buckets with `name`s' do
-        require 'json'
-
-        instance.get_buckets do |error, response|
-          buckets = JSON.parse response
+      it 'yields an array of buckets with `name`s' do
+        instance.get_buckets do |error, buckets|
           are_all_named = buckets.reject {|bucket| bucket[:name].nil?}.empty?
 
           expect(are_all_named).to be(true)
@@ -86,15 +67,13 @@ RSpec.describe LibStorj::Env, extra_broken: true do
     end
 
     context 'with error' do
-      include_examples 'instance of described class'
-
-      it 'yields with a non-nil error value and "null" response' do
+      it 'yields with a non-nil error value and nil response' do
         # (see https://tools.ietf.org/html/rfc2606)
         instance.storj_env[:bridge_options][:host].write_string 'a.nonexistant.example'
 
         expect do |block|
           instance.get_buckets(&block)
-        end.to yield_with_args(/couldn't resolve host name/i, 'null')
+        end.to yield_with_args(/couldn't resolve host name/i, nil)
       end
     end
 

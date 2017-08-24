@@ -30,7 +30,4 @@ module LibStorj
       throw 'json_pointer was a pointer (null or otherwise); json_pointer.class: #{json_pointer.class}'
     end
   end
-
-  require 'ruby-libstorj/factory.rb'
-  require 'ruby-libstorj/callback.rb'
 end
