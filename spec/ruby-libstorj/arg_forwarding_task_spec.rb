@@ -21,10 +21,6 @@ RSpec.describe LibStorj::ArgForwardingTask do
 
         context 'with args' do
           let(:args) {%i[first_arg second_arg third_arg]}
-          let(:expected_args) do
-            ### #=> {:first_arg => :first_value, ...}
-            Hash[args.zip(%i[first_value second_value third_value])]
-          end
 
           context 'without deps' do
             let(:deps) {[]}

@@ -3,7 +3,8 @@ require 'ffi'
 require 'date'
 
 module LibStorj
-  require 'ruby-libstorj/struct'
+  # NB: not currently used but useful for debugging
+  # require 'ruby-libstorj/struct'
   require 'ruby-libstorj/ext/types'
   require 'ruby-libstorj/ext/ext'
 
@@ -27,7 +28,7 @@ module LibStorj
       # rescue #=> e
       # end
     else
-      throw 'json_pointer was a pointer (null or otherwise); json_pointer.class: #{json_pointer.class}'
+      throw "json_pointer was a pointer (null or otherwise); json_pointer.class: #{json_pointer.class}"
     end
   end
 end

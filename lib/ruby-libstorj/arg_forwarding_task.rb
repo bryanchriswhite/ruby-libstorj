@@ -11,10 +11,6 @@ module LibStorj
     attr_reader :alias_tasks
 
     def initialize(target_name, alias_names: [nil], args_deps_hash:, &block)
-      unless args_deps_hash
-        throw ArgumentError.new 'args_deps_hash is required for `ArgForwardingTask.new`'
-      end
-
       @alias_tasks = {}
       @target_task = nil
 
