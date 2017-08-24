@@ -7,3 +7,4 @@
 tmp/*
 spec/helpers/options.yml
 Makefile
+coverage

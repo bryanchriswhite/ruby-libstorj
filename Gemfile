@@ -6,6 +6,8 @@ source 'https://rubygems.org' do
 
   group :test do
     gem 'rspec'
+    gem 'simplecov'
+    gem 'launchy'
   end
 
   group :development do

@@ -85,7 +85,7 @@ rake
 
 ### Run tests:
 #### First create spec/helpers/options.yml !
-For the moment the test suite doesn't start it's own mock backend but it does parse whatever's in the `spec/helpsers/options.yml` file to initialize `LibStorj::Ext::Storj::Env` accordingly.
+For the moment, the test suite doesn't start it's own mock backend but it does parse whatever's in the `spec/helpsers/options.yml` file to initialize `LibStorj::Ext::Storj::Env` to connect via http/https.
 
 You can copy [`spec/helpers/options.yml.example`](./spec/helpers/options.yml.example) and modify it for your use:
 ```bash
@@ -110,22 +110,41 @@ $ rspec --help | less
                          custom formatter class name
 ```
 
+#### Test coverage reporting:
+This repo uses [`simplecov`](https://github.com/colszowka/simplecov) to generage test coverage reports on **each** test run.
+
+When executing tests via rake, a `file://` url to the coverage report is printed for easy copy/pasting into a browser;
+further, if you want to automatically open it (via [`launchy`](https://github.com/copiousfreetime/launchy)) you may pass `y` or `yes` as the second rake argument to either `:spec` or `:test` tasks.
+
+For example usages see "with `rake`" below.
+
 + with `rake`:
     ```bash
     rake test
     
+    # rake test[<formatter>,<open coverage>]
+    #
     # pass <formatter> to rspec as `--format <formatter>` 
-    # rake test[<formatter]
     #
     # e.g. (the following are all equivalent):
     # rake test[doc]
     # rake test[d]
     # rake spec[d]
+    #
+    # open coverage report automatically
+    #
+    # e.g. (also equivalent; using default formatter):
+    # rake test[,yes]
+    # rake test[,y]
+    #
+    # do both
+    #
+    # rake test[d,y]
     ```
     
     Keep in mind that rake will also run any dependencies of the `:test` (or `:spec`) task
     
-    _(e.g. Start a web server or db server or something)_
+    _(e.g. start a web server, open coverage report, etc.)_
 + with `rspec`:
     ```bash
     rspec   # cli args can be passed directly to rspec

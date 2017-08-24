@@ -8,8 +8,7 @@ require_relative './lib/ruby-libstorj/arg_forwarding_task'
 # (see https://relishapp.com/rspec/rspec-core/docs/command-line/rake-task)
 begin
   require 'rspec/core/rake_task'
-
-  RSpec::Core::RakeTask.new(:spec, %i[format] => []) do |t, args|
+  RSpec::Core::RakeTask.new(:rspec, [:format] => []) do |t, args|
     rspec_opts = ''
 
     format_name = args.values_at(*%i[format])
@@ -25,9 +24,24 @@ begin
     t.rspec_opts = rspec_opts unless rspec_opts.empty?
   end
 
-  LibStorj::ArgForwardingTask.new(:spec, alias_names: %i[test], args_deps_hash: {
-      %i[format] => []
-  })
+  LibStorj::ArgForwardingTask.new :spec,
+                                  alias_names: [:test],
+                                  args_deps_hash: {
+                                      %i[format open_coverage] => [:rspec]
+                                  } do |t, args|
+    ### NB: this task only prints the file url line after `simplecov`s output.
+    #       and optionally open it in the default browser. It depends on :rspec,
+    #       which ensures that the tests get run and that this runs after.
+    coverage_url = "file:///#{__dir__}/coverage/index.html"
+    open_coverage = (args.to_hash[:open_coverage] =~ /^y(es)?$/)
+    if open_coverage
+      puts "Opening: #{coverage_url}"
+      require 'launchy'
+      Launchy.open coverage_url
+    else
+      puts "Open in a browser: #{coverage_url}"
+    end
+  end
 rescue LoadError
   # supress `LoadError` exceptions...
 end
