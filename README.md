@@ -83,7 +83,7 @@ rake
     gem install --local ./ruby-libstorj-*.gem  --no-ri --no-rdoc  
     ```
 
-### Run tests:
+### Testing:
 #### First create spec/helpers/options.yml !
 For the moment, the test suite doesn't start it's own mock backend but it does parse whatever's in the `spec/helpsers/options.yml` file to initialize `LibStorj::Ext::Storj::Env` to connect via http/https.
 
@@ -118,6 +118,7 @@ further, if you want to automatically open it (via [`launchy`](https://github.co
 
 For example usages see "with `rake`" below.
 
+#### Running the tests:
 + with `rake`:
     ```bash
     rake test
@@ -148,15 +149,20 @@ For example usages see "with `rake`" below.
 + with `rspec`:
     ```bash
     rspec   # cli args can be passed directly to rspec
-    ```
     
-    Change the rspec formatter:
-    
-    ```bash
-    rspec --format doc   # use the 'document' rspec formatter
-    
-    # short version
-    # rspec -f d
+    # Change the rspec formatter:
+    #
+    # rspec --format doc  # use the 'document' rspec formatter
+    # rspec -f d          # short version
+    #
+    # Test specific files:
+    #
+    # rspec spec/ruby-libstorj/env_spec.rb      # single file
+    # rspec spec/ruby-libstorj/{env,libstorj}*  # glob of files
+    #
+    # Test specific examples:
+    #
+    # rspec spec/ruby-libstorj/env_spec.rb:15   # run test(s) containing line 15
     ```
     (see `rspec --help | less`)
     
