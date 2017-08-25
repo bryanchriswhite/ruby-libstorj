@@ -33,11 +33,22 @@ module LibStorj
                :pass, :pointer
       end
 
-      class BucketMeta < FFI::Struct
+      class Bucket < FFI::Struct
         layout :created, :string,
                :name, :string,
                :id, :string,
                :decrypted, :bool
+
+        def self.pointer_to_array(pointer, array_length)
+          if pointer.nil? || pointer == FFI::MemoryPointer::NULL || array_length < 1
+            return nil
+          end
+
+          ### #=> [#<LibStorj::Ext::Storj::Bucket ...>, ...]
+          (0..(array_length - 1)).map do |i|
+            Bucket.new pointer[i * size]
+          end
+        end
       end
 
       class EncryptOptions < FFI::Struct
@@ -65,13 +76,13 @@ module LibStorj
                :method, :string,
                :path, :string,
                :auth, :bool,
-               :body, :pointer,     # struct json_object *body;
+               :body, :pointer, # struct json_object *body;
                :response, :pointer, # struct json_object *body;
-               :buckets, BucketMeta.ptr,
+               :buckets, :pointer, #BucketMeta.ptr,
                :total_buckets, :uint32,
                :error_code, :int,
                :status_code, :int,
-               :handle, :pointer    # void*
+               :handle, :pointer # void*
       end
 
       JSON_REQUEST_CALLBACK = callback [:string, :string], :void
@@ -82,11 +93,11 @@ module LibStorj
                :method, :string,
                :path, :string,
                :auth, :bool,
-               :body, :pointer,     # struct json_object *body;
+               :body, :pointer, # struct json_object *body;
                :response, :pointer, # struct json_object *response;
                :error_code, :int,
                :status_code, :int,
-               :handle, :pointer    # void*
+               :handle, :pointer # void*
       end
 
       class Env < FFI::Struct
@@ -119,7 +130,7 @@ module LibStorj
       ]
 
       class Work < FFI::Struct
-        layout :data, :pointer,   # void*
+        layout :data, :pointer, # void*
                # read-only
                :type, :uv_work_req,
                # private

@@ -51,17 +51,19 @@ RSpec.describe LibStorj::Env, extra_broken: true do
   describe '#get_buckets' do
     # TODO: refactor error contexts into shared example group 'api request'
     context 'without error' do
+      let(:bucket_class) {::LibStorj::Ext::Storj::Bucket}
+
       it 'yields a nil error and an array of buckets' do
         expect do |block|
           instance.get_buckets(&block)
         end.to yield_with_args(NilClass, Array)
       end
 
-      it 'yields an array of buckets with `name`s' do
+      it 'yields an array of buckets' do
         instance.get_buckets do |error, buckets|
-          are_all_named = buckets.reject {|bucket| bucket[:name].nil?}.empty?
-
-          expect(are_all_named).to be(true)
+          buckets.each do |bucket|
+            expect(bucket).to be_an_instance_of(bucket_class)
+          end
         end
       end
     end

@@ -4,7 +4,7 @@ require 'date'
 
 module LibStorj
   # NB: not currently used but useful for debugging
-  # require 'ruby-libstorj/struct'
+  require 'ruby-libstorj/struct'
   require 'ruby-libstorj/ext/types'
   require 'ruby-libstorj/ext/ext'
 

@@ -16,20 +16,67 @@ module LibStorj
     end
 
     def get_info(&block)
+      req_data_type = ::LibStorj::Ext::Storj::JsonRequest
+      _after_work_cb = after_work_cb(req_data_type) do |req, error, response, handle|
+        c_handle = FFI::Function.new :void, %i[string string], handle
+
+        # call sequence: `c_handle` -> c ... -> `ruby_handle` -> `ruby_handle`'s block
+        c_handle.call error, response
+      end
+
       uv_queue_and_run do
-        req_data_type = ::LibStorj::Ext::Storj::JsonRequest
         ::LibStorj::Ext::Storj.get_info @storj_env,
                                         ruby_handle(&block),
-                                        after_work_cb(req_data_type)
+                                        _after_work_cb
       end
     end
 
-    def get_buckets(&block)
+    def get_buckets
+      req_data_type = ::LibStorj::Ext::Storj::GetBucketRequest
+      _after_work_cb = after_work_cb(req_data_type) do |req, error, response, handle|
+        buckets, total_buckets = req.values_at %i[buckets total_buckets]
+
+        c_handle = FFI::Function.new :void, %i[string pointer int], handle
+
+        # call sequence: `c_handle` -> c ... -> `ruby_handle` -> `ruby_handle`'s block
+        c_handle.call error, buckets, total_buckets
+      end
+
+      _ruby_handle = FFI::Function.new :void, %i[string pointer int] do
+      |error, buckets_pointer, bucket_count|
+        buckets = ::LibStorj::Ext::Storj::Bucket.pointer_to_array buckets_pointer, bucket_count
+        yield error, buckets
+      end
+
       uv_queue_and_run do
-        req_data_type = ::LibStorj::Ext::Storj::GetBucketRequest
         ::LibStorj::Ext::Storj.get_buckets @storj_env,
-                                           ruby_handle(&block),
-                                           after_work_cb(req_data_type)
+                                           _ruby_handle,
+                                           _after_work_cb
+      end
+    end
+
+    def create_bucket(name)
+      req_data_type = ::LibStorj::Ext::Storj::CreateBucketRequest
+      _after_work_cb = after_work_cb(req_data_type) do |req, error, response, handle|
+        bucket_struct = ::LibStorj::Ext::Storj::Bucket
+        bucket = bucket_struct.new req[:bucket]
+
+        c_handle = FFI::Function.new :void, %i[string pointer], handle
+
+
+        # call sequence: `c_handle` -> c ... -> `ruby_handle` -> `ruby_handle`'s block
+        c_handle.call error, bucket
+      end
+      _ruby_handle = FFI::Function.new :void, %i[string pointer] do |error, bucket_pointer|
+        bucket = ::LibStorj::Ext::Storj::Bucket.new bucket_pointer
+        yield error, bucket
+      end
+
+      uv_queue_and_run do
+        ::LibStorj::Ext::Storj.create_bucket @storj_env,
+                                             name,
+                                             _ruby_handle,
+                                             _after_work_cb
       end
     end
 
@@ -63,15 +110,14 @@ module LibStorj
 
       FFI::Function.new :void, args do |work_req_ptr|
         req = req_data_type.new work_req_ptr[:data]
-        error = curl_error_code_to_string req[:error_code]
         response = json_c_to_string req[:response]
-        c_handle = FFI::Function.new :void, %i[string string], req[:handle]
+        error = curl_error_code_to_string req[:error_code]
+        handle = req[:handle]
 
         # default error
-        error = 'Failed to get info' if error.nil? && (response.nil? || response.empty?)
+        error = 'Failed to create bucket' if error.nil? && (response.nil? || response.empty?)
 
-        # call sequence: `c_handle` -> c ... -> `ruby_handle` -> `ruby_handle`'s block
-        c_handle.call error, response
+        yield req, error, response, handle
       end
     end
 
@@ -80,9 +126,9 @@ module LibStorj
     def ruby_handle
       # do final data massaging to ruby here;
       # types are no longer restricted, no more pointers or casting
-      FFI::Function.new :void, %i[string string] do |error, response|
+      FFI::Function.new :void, %i[string pointer] do |error, response|
         # begin
-        response = JSON.parse response
+        response = JSON.parse response.read_string
         #   TODO: better error handling
         # rescue JSON::ParserError
         # end

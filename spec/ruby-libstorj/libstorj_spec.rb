@@ -65,7 +65,7 @@ RSpec.describe LibStorj do
       it 'raises an exception' do
         expect do
           parse_json
-        end.to raise_error
+        end.to raise_error ArgumentError
       end
     end
 
