@@ -25,6 +25,7 @@ RSpec.describe ::LibStorj::Ext::JsonC do
       let(:json_pointer) do
         ::LibStorj::Ext::JsonC.parse json_string
       end
+
       let(:actual_string) do
         described_class.stringify json_pointer
       end
