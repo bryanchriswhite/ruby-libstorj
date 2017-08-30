@@ -22,10 +22,14 @@ module LibStorj
 
         c_handle.call error, response
       end
+      _ruby_handle = ruby_handle do |error, response|
+        error = nil if error.empty?
+        yield error, response
+      end
 
       uv_queue_and_run do
         ::LibStorj::Ext::Storj.get_info @storj_env,
-                                        ruby_handle(&block),
+                                        _ruby_handle,
                                         _after_work_cb
       end
     end
@@ -52,10 +56,10 @@ module LibStorj
       end
 
       uv_queue_and_run do
-        ::LibStorj::Ext::Storj.delete_bucket @storj_env,
-                                             bucket_id,
-                                             _ruby_handle,
-                                             _after_work_cb
+        ::LibStorj::Ext::Storj::Bucket.delete @storj_env,
+                                              bucket_id,
+                                              _ruby_handle,
+                                              _after_work_cb
       end
     end
 
@@ -77,7 +81,7 @@ module LibStorj
       end
 
       uv_queue_and_run do
-        ::LibStorj::Ext::Storj.get_buckets @storj_env,
+        ::LibStorj::Ext::Storj::Bucket.all @storj_env,
                                            _ruby_handle,
                                            _after_work_cb
       end
@@ -107,10 +111,10 @@ module LibStorj
       end
 
       uv_queue_and_run do
-        ::LibStorj::Ext::Storj.create_bucket @storj_env,
-                                             name,
-                                             _ruby_handle,
-                                             _after_work_cb
+        ::LibStorj::Ext::Storj::Bucket.create @storj_env,
+                                              name,
+                                              _ruby_handle,
+                                              _after_work_cb
       end
     end
 
@@ -118,8 +122,6 @@ module LibStorj
       reactor do |reactor|
         @chain = reactor.work do
           yield
-          # NB: .catch is IMPORTANT!, libuv effectively swallows
-          # async errors without this
         end.catch do |error|
           raise error
         end

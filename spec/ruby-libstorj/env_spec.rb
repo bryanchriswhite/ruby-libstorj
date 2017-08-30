@@ -15,7 +15,7 @@ RSpec.shared_examples 'external error' do |method_name, *yield_args|
 end
 
 
-RSpec.describe LibStorj::Env, extra_broken: true do
+RSpec.describe LibStorj::Env do
   let(:bucket_class) {::LibStorj::Ext::Storj::Bucket}
   let(:instance) do
     described_class.new(*default_options)
@@ -25,6 +25,44 @@ RSpec.describe LibStorj::Env, extra_broken: true do
     # (see https://github.com/Storj/ruby-libstorj/issues/2)
     # Process.RLIMIT_MEMLOCK #=> 8
     instance.destroy
+  end
+
+  describe '.uv_queue_and_run' do
+    before :all do
+      module LibStorj
+        class Env
+          def uv_queue_and_run_test_proxy(*args, &block)
+            uv_queue_and_run(*args, &block)
+          end
+        end
+      end
+    end
+
+    context 'without error' do
+      it 'yields the block asynchronously' do
+        expect do |block|
+          instance.uv_queue_and_run_test_proxy(&block)
+        end.to yield_control
+      end
+
+      it 'returns a promise' do
+        expect(instance.uv_queue_and_run_test_proxy do
+          #-- noop
+        end).to respond_to(:then, :catch)
+      end
+    end
+
+    context 'catching an async error' do
+      let(:test_error) {Exception.new 'test exception'}
+
+      it 'raises an `ArgumentError`' do
+        expect do
+          instance.uv_queue_and_run_test_proxy do
+            raise(test_error)
+          end
+        end.to raise_error(test_error)
+      end
+    end
   end
 
   describe 'new' do
@@ -44,7 +82,7 @@ RSpec.describe LibStorj::Env, extra_broken: true do
   end
 
   describe '#get_info' do
-    xcontext 'without error' do
+    context 'without error' do
       it 'yields with an nil error and hash response' do
         instance.get_info do |error, info|
           expect(error).to be(nil)

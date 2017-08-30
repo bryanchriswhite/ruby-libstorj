@@ -26,29 +26,6 @@ module LibStorj
       # ::LibStorj::UV::
       ], :int)
 
-      attach_function('get_buckets', 'storj_bridge_get_buckets', [
-          Env.ptr,
-          JSON_REQUEST_CALLBACK,
-          :pointer # uv_after_work_cb*
-      # ::LibStorj::UV::
-      ], :int)
-
-      attach_function('create_bucket', 'storj_bridge_create_bucket', [
-          Env.ptr,
-          :string,
-          JSON_REQUEST_CALLBACK,
-          :pointer # uv_after_work_cb*
-      # ::LibStorj::UV::
-      ], :int)
-
-      attach_function('delete_bucket', 'storj_bridge_delete_bucket', [
-          Env.ptr,
-          :string,
-          JSON_REQUEST_CALLBACK,
-          :pointer # uv_after_work_cb*
-      # ::LibStorj::UV::
-      ], :int)
-
       attach_function('destroy_env', 'storj_destroy_env', [
           Env.ptr
       ], :int)
@@ -61,6 +38,9 @@ module LibStorj
       ], Env.ptr)
 
       class Bucket < FFI::Struct
+        extend FFI::Library
+        ffi_lib('storj')
+
         attr_reader :name, :id
 
         def initialize(*args)
@@ -69,6 +49,47 @@ module LibStorj
           @name = self[:name]
           @id = self[:id]
         end
+
+        def self.all(*args)
+          _all(*args)
+        end
+
+        def self.create(*args)
+          _create(*args)
+        end
+
+        def self.delete(*args)
+          _delete(*args)
+        end
+
+        attach_function('_all', 'storj_bridge_get_buckets', [
+            Env.ptr,
+            JSON_REQUEST_CALLBACK,
+            :pointer # uv_after_work_cb*
+        # ::LibStorj::UV::
+        ], :int)
+
+        private :_all
+
+        attach_function('_create', 'storj_bridge_create_bucket', [
+            Env.ptr,
+            :string,
+            JSON_REQUEST_CALLBACK,
+            :pointer # uv_after_work_cb*
+        # ::LibStorj::UV::
+        ], :int)
+
+        private :_create
+
+        attach_function('_delete', 'storj_bridge_delete_bucket', [
+            Env.ptr,
+            :string,
+            JSON_REQUEST_CALLBACK,
+            :pointer # uv_after_work_cb*
+        # ::LibStorj::UV::
+        ], :int)
+
+        private :_delete
 
         def self.pointer_to_array(pointer, array_length)
           if pointer.nil? || pointer == FFI::MemoryPointer::NULL || array_length < 1
