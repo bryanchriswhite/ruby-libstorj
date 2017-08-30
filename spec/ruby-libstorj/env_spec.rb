@@ -14,6 +14,7 @@ RSpec.describe LibStorj::Env do
   end
 
   describe '.uv_queue_and_run' do
+    # expose otherwise private `LibStorj::Env#uv_queue_and_run`
     before :all do
       module LibStorj
         class Env
@@ -152,12 +153,17 @@ RSpec.describe LibStorj::Env do
         yield
       end
 
+      after do
+        clean_buckets
+      end
+
       it 'yields with nil error and the new bucket' do
         clean_buckets do
           instance.create_bucket(test_bucket_name) do |error, bucket|
             expect(error).to be(nil)
             expect(bucket).to be_an_instance_of(bucket_class)
           end
+          sleep 3
         end
       end
     end
