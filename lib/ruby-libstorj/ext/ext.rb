@@ -11,8 +11,8 @@ module LibStorj
       extend FFI::Library
       ffi_lib('json-c')
 
-      attach_function('parse', 'json_object_to_json_string', [:pointer], :string)
-      attach_function('stringify', 'json_tokener_parse', [:string], :pointer)
+      attach_function('stringify', 'json_object_to_json_string', [:pointer], :string)
+      attach_function('parse', 'json_tokener_parse', [:string], :pointer)
     end
 
     module Storj

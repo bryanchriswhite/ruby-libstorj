@@ -1,6 +1,20 @@
 require_relative '../helpers/storj_options'
 include LibStorjTest
 
+RSpec.shared_examples 'external error' do |method_name, *yield_args|
+  describe 'external error' do
+    it 'yields with a non-nil error value and nil response' do
+      # (see https://tools.ietf.org/html/rfc2606)
+      instance.storj_env[:bridge_options][:host].write_string 'a.nonexistant.example'
+
+      expect do |block|
+        instance.method(method_name).call(test_bucket_name, &block)
+      end.to yield_with_args(*yield_args)
+    end
+  end
+end
+
+
 RSpec.describe LibStorj::Env, extra_broken: true do
   let(:bucket_class) {::LibStorj::Ext::Storj::Bucket}
   let(:instance) do
@@ -88,10 +102,6 @@ RSpec.describe LibStorj::Env, extra_broken: true do
         end.to yield_with_args(/couldn't resolve host name/i, nil)
       end
     end
-
-    # context 'with invalid credentials' do
-    #
-    # end
   end
 
   def get_test_bucket_id(&block)
@@ -130,6 +140,8 @@ RSpec.describe LibStorj::Env, extra_broken: true do
     end
 
     context 'with error' do
+      include_examples 'external error', :create_bucket, /couldn't resolve host name/i, nil
+
       describe 'bucket name in use' do
         before do
           instance.create_bucket(test_bucket_name)
@@ -140,17 +152,6 @@ RSpec.describe LibStorj::Env, extra_broken: true do
           expect do |block|
             instance.create_bucket(test_bucket_name, &block)
           end.to yield_with_args(/name already used by another bucket/i, nil)
-        end
-      end
-
-      describe 'external error' do
-        it 'yields with a non-nil error value and nil response' do
-          # (see https://tools.ietf.org/html/rfc2606)
-          instance.storj_env[:bridge_options][:host].write_string 'a.nonexistant.example'
-
-          expect do |block|
-            instance.create_bucket(test_bucket_name, &block)
-          end.to yield_with_args(/couldn't resolve host name/i, nil)
         end
       end
     end
@@ -177,16 +178,7 @@ RSpec.describe LibStorj::Env, extra_broken: true do
     end
 
     context 'with error' do
-      describe 'external error' do
-        it 'yields with a non-nil error' do
-          # (see https://tools.ietf.org/html/rfc2606)
-          instance.storj_env[:bridge_options][:host].write_string 'a.nonexistant.example'
-
-          expect do |block|
-            instance.delete_bucket(test_bucket_name, &block)
-          end.to yield_with_args(/couldn't resolve host name/i)
-        end
-      end
+      include_examples 'external error', :delete_bucket, /couldn't resolve host name/i
 
       describe 'malformed id error' do
         let(:malformed_bucket_id) {'__ruby-libstorj_test-non-existant'}

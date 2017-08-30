@@ -20,7 +20,6 @@ module LibStorj
       _after_work_cb = after_work_cb(req_data_type) do |req, error, response, handle|
         c_handle = FFI::Function.new :void, %i[string string], handle
 
-        # call sequence: `c_handle` -> c ... -> `ruby_handle` -> `ruby_handle`'s block
         c_handle.call error, response
       end
 
@@ -38,7 +37,7 @@ module LibStorj
 
         return c_handle.call(error) unless error.empty?
         status_code, response_pointer = req.values_at %i[status_code response]
-        response = ::LibStorj::Ext::JsonC.parse(response_pointer)
+        response = ::LibStorj::Ext::JsonC.stringify(response_pointer)
 
         if ((status_code > 299)) && error.empty?
           response_error = JSON.parse(response)['error']
@@ -140,7 +139,7 @@ module LibStorj
     private :curl_error_code_to_string
 
     def json_c_to_string(json_c_obj)
-      ::LibStorj::Ext::JsonC.parse json_c_obj
+      ::LibStorj::Ext::JsonC.stringify json_c_obj
     end
 
     private :json_c_to_string

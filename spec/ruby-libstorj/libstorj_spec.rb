@@ -55,7 +55,7 @@ RSpec.describe LibStorj do
     end
   end
 
-  describe '.parse' do
+  describe '.stringify' do
     context 'with a invalid argument' do
       let(:random_arg) {'i\'m random'}
       let(:parse) do
@@ -80,9 +80,27 @@ RSpec.describe LibStorj do
       end
     end
 
-    xcontext 'with a pointer to the following JSON object: `[{}]`' do
+    context 'with a pointer to a JsonC object' do
+      let(:expected_hash) {JSON.parse json_string}
+      let(:json_string) {'{"frist_prop": "first-value", "second_prop": ["second", "values"]}'}
       let(:json_pointer) do
-        # ...
+        ::LibStorj::Ext::JsonC.parse json_string
+      end
+      let(:actual_string) do
+        described_class.stringify json_pointer
+      end
+
+      let(:actual_hash) do
+        begin
+          JSON.parse(json_string)
+        rescue RuntimeError => error
+          fail error
+        end
+      end
+
+      it 'returns a valid json string' do
+        expect(actual_string).to be_an_instance_of(String)
+        expect(actual_hash).to eq(expected_hash)
       end
     end
   end
