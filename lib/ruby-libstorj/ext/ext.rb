@@ -5,6 +5,13 @@ module LibStorj
       ffi_lib('curl')
 
       attach_function('easy_stderr', 'curl_easy_strerror', [:curl_code], :string)
+
+      def self.curl_code_to_string(error_code)
+        return nil if error_code.nil?
+
+        curl_error = ::LibStorj::Ext::Curl.easy_stderr(error_code)
+        error_code > 0 ? curl_error : ''
+      end
     end
 
     module JsonC
@@ -21,7 +28,7 @@ module LibStorj
 
       attach_function('get_info', 'storj_bridge_get_info', [
           Env.ptr,
-          JSON_REQUEST_CALLBACK,
+          ::LibStorj::Ext::Storj::JsonRequest::CALLBACK,
           :pointer # uv_after_work_cb*
       # ::LibStorj::UV::
       ], :int)
@@ -36,72 +43,6 @@ module LibStorj
           HttpOptions.ptr,
           LogOptions.ptr
       ], Env.ptr)
-
-      class Bucket < FFI::Struct
-        extend FFI::Library
-        ffi_lib('storj')
-
-        attr_reader :name, :id
-
-        def initialize(*args)
-          super(*args)
-
-          @name = self[:name]
-          @id = self[:id]
-        end
-
-        def self.all(*args)
-          _all(*args)
-        end
-
-        def self.create(*args)
-          _create(*args)
-        end
-
-        def self.delete(*args)
-          _delete(*args)
-        end
-
-        attach_function('_all', 'storj_bridge_get_buckets', [
-            Env.ptr,
-            JSON_REQUEST_CALLBACK,
-            :pointer # uv_after_work_cb*
-        # ::LibStorj::UV::
-        ], :int)
-
-        private :_all
-
-        attach_function('_create', 'storj_bridge_create_bucket', [
-            Env.ptr,
-            :string,
-            JSON_REQUEST_CALLBACK,
-            :pointer # uv_after_work_cb*
-        # ::LibStorj::UV::
-        ], :int)
-
-        private :_create
-
-        attach_function('_delete', 'storj_bridge_delete_bucket', [
-            Env.ptr,
-            :string,
-            JSON_REQUEST_CALLBACK,
-            :pointer # uv_after_work_cb*
-        # ::LibStorj::UV::
-        ], :int)
-
-        private :_delete
-
-        def self.pointer_to_array(pointer, array_length)
-          if pointer.nil? || pointer == FFI::MemoryPointer::NULL || array_length < 1
-            return nil
-          end
-
-          ### #=> [#<LibStorj::Ext::Storj::Bucket ...>, ...]
-          (0..(array_length - 1)).map do |i|
-            Bucket.new pointer[i * size]
-          end
-        end
-      end
     end
 
     module UV

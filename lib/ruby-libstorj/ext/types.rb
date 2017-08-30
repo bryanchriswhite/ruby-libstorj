@@ -16,7 +16,6 @@ module LibStorj
 
     module Curl
       extend FFI::Library
-
       require 'ruby-libstorj/ext/curl_code'
 
       enum(:curl_code, CURL_CODES)
@@ -58,55 +57,11 @@ module LibStorj
                :level, :int
       end
 
-      class GetBucketRequest < FFI::Struct
-        layout :http_options, HttpOptions.ptr,
-               :encrypt_options, EncryptOptions.ptr,
-               :options, BridgeOptions.ptr,
-               :method, :string,
-               :path, :string,
-               :auth, :bool,
-               :body, :pointer, # struct json_object *body;
-               :response, :pointer, # struct json_object *body;
-               :buckets, :pointer, #BucketMeta.ptr,
-               :total_buckets, :uint32,
-               :error_code, :int,
-               :status_code, :int,
-               :handle, :pointer # void*
-      end
-
-      class CreateBucketRequest < FFI::Struct
-        layout :http_options, HttpOptions.ptr,
-               :encrypt_options, EncryptOptions.ptr,
-               :bridge_options, BridgeOptions.ptr,
-               :bucket_name, :string,
-               :encrypted_bucket_name, :string,
-               :response, :pointer, # struct json_object *response;
-               :bucket, Bucket.ptr,
-               :error_code, :int,
-               :status_code, :int,
-               :handle, :pointer # void*
-      end
-
-      JSON_REQUEST_CALLBACK = callback [:string, :string], :void
-
-      class JsonRequest < FFI::Struct
-        layout :http_options, HttpOptions.ptr,
-               :options, BridgeOptions.ptr,
-               :method, :string,
-               :path, :string,
-               :auth, :bool,
-               :body, :pointer, # struct json_object *body;
-               :response, :pointer, # struct json_object *response;
-               :error_code, :int,
-               :status_code, :int,
-               :handle, :pointer # void*
-      end
-
       class Env < FFI::Struct
-        layout :bridge_options, BridgeOptions.ptr,
-               :encrypt_options, EncryptOptions.ptr,
-               :http_options, HttpOptions.ptr,
-               :log_options, LogOptions.ptr,
+        layout :bridge_options, BridgeOptions.by_ref,
+               :encrypt_options, EncryptOptions.by_ref,
+               :http_options, HttpOptions.by_ref,
+               :log_options, LogOptions.by_ref,
                :tmp_path, :pointer,
                :loop, :pointer, # uv_loop_t*
                :log, :pointer # storj_log_levels_t*

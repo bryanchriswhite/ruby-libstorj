@@ -2,7 +2,7 @@ RSpec.describe ::LibStorj::Ext::JsonC do
   describe '.stringify' do
     # TODO: find a way to prevent segfaults
     xcontext 'with a invalid argument' do
-      let(:random_arg) {'i\'m random'}
+      let(:random_arg) {'index\'m random'}
 
       it 'raises an exception' do
         expect do
@@ -41,6 +41,34 @@ RSpec.describe ::LibStorj::Ext::JsonC do
       it 'returns a valid json string' do
         expect(actual_string).to be_an_instance_of(String)
         expect(actual_hash).to eq(expected_hash)
+      end
+    end
+  end
+end
+
+RSpec.describe ::LibStorj::Ext::Curl do
+  describe '.curl_code_to_string' do
+    let(:curl_codes) {[0, 1, 2, 3, 6]}
+    let(:curl_error_messages) do
+      [
+          '',
+          'unsupported protocol',
+          'failed initialization',
+          'url using bad/illegal format or missing url',
+          %q(couldn't resolve host name)
+      ]
+    end
+
+    it 'returns the correct error string for all curl error code' do
+      curl_codes.each_with_index do |curl_code, index|
+        # exclude element at index 1
+        next if index == 2
+
+        # account for index offset
+        index -= 1 if index > 1
+
+        error_message = described_class.curl_code_to_string index
+        expect(error_message).to match(Regexp.new curl_error_messages[index], 'i')
       end
     end
   end

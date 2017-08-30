@@ -6,6 +6,10 @@ module LibStorj
   # NB: not currently used but useful for debugging
   require 'ruby-libstorj/struct'
   require 'ruby-libstorj/ext/types'
+  require 'ruby-libstorj/ext/json_request'
+  require 'ruby-libstorj/ext/get_bucket_request'
+  require 'ruby-libstorj/ext/create_bucket_request'
+  require 'ruby-libstorj/ext/bucket'
   require 'ruby-libstorj/ext/ext'
 
   require 'ruby-libstorj/env'

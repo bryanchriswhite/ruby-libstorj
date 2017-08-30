@@ -7,8 +7,8 @@ RSpec.describe FFI::Struct do
     end
 
     class ComplexStruct < FFI::Struct
-      layout :simple_struct_1, SimpleStruct.ptr,
-             :simple_struct_2, SimpleStruct.ptr,
+      layout :simple_struct_1, SimpleStruct.by_ref,
+             :simple_struct_2, SimpleStruct.by_ref,
              :another_string, :pointer,
              :null_member, :pointer
     end
