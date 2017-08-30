@@ -55,28 +55,28 @@ RSpec.describe LibStorj do
     end
   end
 
-  describe '.parse_json' do
+  describe '.parse' do
     context 'with a invalid argument' do
       let(:random_arg) {'i\'m random'}
-      let(:parse_json) do
-        described_class.parse_json random_arg
+      let(:parse) do
+        described_class.parse random_arg
       end
 
       it 'raises an exception' do
         expect do
-          parse_json
+          parse
         end.to raise_error ArgumentError
       end
     end
 
     context 'with a null pointer' do
       let(:json_pointer) {FFI::MemoryPointer::NULL}
-      let(:parse_json) do
-        described_class.parse_json json_pointer
+      let(:parse) do
+        described_class.parse json_pointer
       end
 
       it 'returns the string "null"' do
-        expect(parse_json).to eq('null')
+        expect(parse).to eq('null')
       end
     end
 

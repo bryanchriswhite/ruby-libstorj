@@ -18,12 +18,12 @@ module LibStorj
     DateTime.strptime(LibStorj.util_timestamp.to_s, '%Q')
   end
 
-  def self.parse_json(json_pointer)
+  def self.parse(json_pointer)
     if json_pointer.is_a?(FFI::Pointer)
       return 'null' if json_pointer.null?
 
       # begin
-      ::LibStorj::Ext::JsonC.parse_json(json_pointer)
+      ::LibStorj::Ext::JsonC.parse(json_pointer)
       # TODO: better error handling
       # rescue #=> e
       # end

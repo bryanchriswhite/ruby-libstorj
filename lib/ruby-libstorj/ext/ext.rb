@@ -11,7 +11,8 @@ module LibStorj
       extend FFI::Library
       ffi_lib('json-c')
 
-      attach_function('parse_json', 'json_object_to_json_string', [:pointer], :string)
+      attach_function('parse', 'json_object_to_json_string', [:pointer], :string)
+      attach_function('stringify', 'json_tokener_parse', [:string], :pointer)
     end
 
     module Storj
@@ -32,6 +33,22 @@ module LibStorj
       # ::LibStorj::UV::
       ], :int)
 
+      attach_function('create_bucket', 'storj_bridge_create_bucket', [
+          Env.ptr,
+          :string,
+          JSON_REQUEST_CALLBACK,
+          :pointer # uv_after_work_cb*
+      # ::LibStorj::UV::
+      ], :int)
+
+      attach_function('delete_bucket', 'storj_bridge_delete_bucket', [
+          Env.ptr,
+          :string,
+          JSON_REQUEST_CALLBACK,
+          :pointer # uv_after_work_cb*
+      # ::LibStorj::UV::
+      ], :int)
+
       attach_function('destroy_env', 'storj_destroy_env', [
           Env.ptr
       ], :int)
@@ -42,6 +59,28 @@ module LibStorj
           HttpOptions.ptr,
           LogOptions.ptr
       ], Env.ptr)
+
+      class Bucket < FFI::Struct
+        attr_reader :name, :id
+
+        def initialize(*args)
+          super(*args)
+
+          @name = self[:name]
+          @id = self[:id]
+        end
+
+        def self.pointer_to_array(pointer, array_length)
+          if pointer.nil? || pointer == FFI::MemoryPointer::NULL || array_length < 1
+            return nil
+          end
+
+          ### #=> [#<LibStorj::Ext::Storj::Bucket ...>, ...]
+          (0..(array_length - 1)).map do |i|
+            Bucket.new pointer[i * size]
+          end
+        end
+      end
     end
 
     module UV

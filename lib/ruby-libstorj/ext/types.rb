@@ -38,17 +38,6 @@ module LibStorj
                :name, :string,
                :id, :string,
                :decrypted, :bool
-
-        def self.pointer_to_array(pointer, array_length)
-          if pointer.nil? || pointer == FFI::MemoryPointer::NULL || array_length < 1
-            return nil
-          end
-
-          ### #=> [#<LibStorj::Ext::Storj::Bucket ...>, ...]
-          (0..(array_length - 1)).map do |i|
-            Bucket.new pointer[i * size]
-          end
-        end
       end
 
       class EncryptOptions < FFI::Struct
@@ -80,6 +69,19 @@ module LibStorj
                :response, :pointer, # struct json_object *body;
                :buckets, :pointer, #BucketMeta.ptr,
                :total_buckets, :uint32,
+               :error_code, :int,
+               :status_code, :int,
+               :handle, :pointer # void*
+      end
+
+      class CreateBucketRequest < FFI::Struct
+        layout :http_options, HttpOptions.ptr,
+               :encrypt_options, EncryptOptions.ptr,
+               :bridge_options, BridgeOptions.ptr,
+               :bucket_name, :string,
+               :encrypted_bucket_name, :string,
+               :response, :pointer, # struct json_object *response;
+               :bucket, Bucket.ptr,
                :error_code, :int,
                :status_code, :int,
                :handle, :pointer # void*

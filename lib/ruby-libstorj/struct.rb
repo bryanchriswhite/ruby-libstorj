@@ -4,10 +4,10 @@ module LibStorj
     #   must match assignment order!
     #
     # example: ```
-    #       log_options = StorjLogOptions_t.new(...)
-    #       logger, level = log_options.values_at(:logger, :level)
-    #       # OR logger, level = log_options.values_at([:logger, :level])
-    #       # OR logger, level = log_options.values_at(%i[logger level])
+    #       bucket = ::LibStorj::Ext::Bucket.new
+    #       name, id, decrypted = bucket.values_at(:name, :id, :decrypted)
+    #       # OR name, id, decrypted = bucket.values_at([:name, :id, :decrypted])
+    #       # OR name, id, decrypted = bucket.values_at(%i[name id decrypted])
     #       ```
 
     def values_at(*members)

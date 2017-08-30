@@ -31,6 +31,35 @@ module LibStorj
       end
     end
 
+    def delete_bucket(bucket_id, &block)
+      req_data_type = ::LibStorj::Ext::Storj::JsonRequest
+      _after_work_cb = after_work_cb(req_data_type) do |req, error, response_pointer, handle|
+        c_handle = FFI::Function.new :void, %i[string], handle
+
+        return c_handle.call(error) unless error.empty?
+        status_code, response_pointer = req.values_at %i[status_code response]
+        response = ::LibStorj::Ext::JsonC.parse(response_pointer)
+
+        if ((status_code > 299)) && error.empty?
+          response_error = JSON.parse(response)['error']
+          return c_handle.call(response_error)
+        end
+
+        c_handle.call error
+      end
+
+      _ruby_handle = FFI::Function.new :void, %i[string] do |error|
+        yield(error.empty? ? nil : error) if block
+      end
+
+      uv_queue_and_run do
+        ::LibStorj::Ext::Storj.delete_bucket @storj_env,
+                                             bucket_id,
+                                             _ruby_handle,
+                                             _after_work_cb
+      end
+    end
+
     def get_buckets
       req_data_type = ::LibStorj::Ext::Storj::GetBucketRequest
       _after_work_cb = after_work_cb(req_data_type) do |req, error, response, handle|
@@ -55,21 +84,27 @@ module LibStorj
       end
     end
 
-    def create_bucket(name)
+    def create_bucket(name, &block)
       req_data_type = ::LibStorj::Ext::Storj::CreateBucketRequest
       _after_work_cb = after_work_cb(req_data_type) do |req, error, response, handle|
-        bucket_struct = ::LibStorj::Ext::Storj::Bucket
-        bucket = bucket_struct.new req[:bucket]
-
         c_handle = FFI::Function.new :void, %i[string pointer], handle
 
+        # require 'pry'
+        # binding.pry
+        return c_handle.call(error, ::FFI::MemoryPointer::NULL) unless error.empty?
+        status_code, bucket = req.values_at %i[status_code bucket]
+        if ((status_code > 299) || bucket.id.nil?) && error.empty?
+          response_error = JSON.parse(response)['error']
+          error = response_error
+          return c_handle.call(error, ::FFI::MemoryPointer::NULL)
+        end
 
-        # call sequence: `c_handle` -> c ... -> `ruby_handle` -> `ruby_handle`'s block
-        c_handle.call error, bucket
+        bucket_pointer = req[:bucket]
+        c_handle.call nil, bucket_pointer
       end
       _ruby_handle = FFI::Function.new :void, %i[string pointer] do |error, bucket_pointer|
-        bucket = ::LibStorj::Ext::Storj::Bucket.new bucket_pointer
-        yield error, bucket
+        bucket = bucket_pointer.null? ? nil : ::LibStorj::Ext::Storj::Bucket.new(bucket_pointer)
+        yield error, bucket if block
       end
 
       uv_queue_and_run do
@@ -82,10 +117,15 @@ module LibStorj
 
     def uv_queue_and_run
       reactor do |reactor|
-        reactor.work do
+        @chain = reactor.work do
           yield
+          # NB: .catch is IMPORTANT!, libuv effectively swallows
+          # async errors without this
+        end.catch do |error|
+          raise error
         end
       end
+      @chain
     end
 
     private :uv_queue_and_run
@@ -94,13 +134,13 @@ module LibStorj
       return nil if error_code.nil?
 
       curl_error = ::LibStorj::Ext::Curl.easy_stderr(error_code)
-      error_code > 0 ? curl_error : nil
+      error_code > 0 ? curl_error : ''
     end
 
     private :curl_error_code_to_string
 
     def json_c_to_string(json_c_obj)
-      ::LibStorj::Ext::JsonC.parse_json json_c_obj
+      ::LibStorj::Ext::JsonC.parse json_c_obj
     end
 
     private :json_c_to_string
@@ -114,16 +154,13 @@ module LibStorj
         error = curl_error_code_to_string req[:error_code]
         handle = req[:handle]
 
-        # default error
-        error = 'Failed to create bucket' if error.nil? && (response.nil? || response.empty?)
-
         yield req, error, response, handle
       end
     end
 
     private :after_work_cb
 
-    def ruby_handle
+    def ruby_handle(&block)
       # do final data massaging to ruby here;
       # types are no longer restricted, no more pointers or casting
       FFI::Function.new :void, %i[string pointer] do |error, response|
@@ -133,7 +170,7 @@ module LibStorj
         # rescue JSON::ParserError
         # end
 
-        yield error, response
+        yield error, response if block
       end
     end
 
