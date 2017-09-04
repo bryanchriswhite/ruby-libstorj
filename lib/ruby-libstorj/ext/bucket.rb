@@ -38,7 +38,7 @@ module LibStorj
         end
 
         attach_function('_all', 'storj_bridge_get_buckets', [
-            Env.ptr,
+            Env.by_ref,
             ::LibStorj::Ext::Storj::JsonRequest::CALLBACK,
             :pointer # uv_after_work_cb*
         # ::LibStorj::UV::
@@ -47,7 +47,7 @@ module LibStorj
         private :_all
 
         attach_function('_create', 'storj_bridge_create_bucket', [
-            Env.ptr,
+            Env.by_ref,
             :string,
             ::LibStorj::Ext::Storj::JsonRequest::CALLBACK,
             :pointer # uv_after_work_cb*
@@ -57,7 +57,7 @@ module LibStorj
         private :_create
 
         attach_function('_delete', 'storj_bridge_delete_bucket', [
-            Env.ptr,
+            Env.by_ref,
             :string,
             ::LibStorj::Ext::Storj::JsonRequest::CALLBACK,
             :pointer # uv_after_work_cb*

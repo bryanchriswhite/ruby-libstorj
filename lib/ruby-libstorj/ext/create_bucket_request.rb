@@ -2,19 +2,19 @@ module LibStorj
   module Ext
     module Storj
       class CreateBucketRequest < FFI::Struct
-        layout :http_options, HttpOptions.ptr,
-               :encrypt_options, EncryptOptions.ptr,
-               :bridge_options, BridgeOptions.ptr,
+        layout :http_options, HttpOptions.by_ref,
+               :encrypt_options, EncryptOptions.by_ref,
+               :bridge_options, BridgeOptions.by_ref,
                :bucket_name, :string,
                :encrypted_bucket_name, :string,
                :response, :pointer, # struct json_object *response;
-               :bucket, Bucket.ptr,
+               :bucket, Bucket.by_ref,
                :error_code, :int,
                :status_code, :int,
                :handle, :pointer # void*
 
         def self.after_work_cb
-          args = [::LibStorj::Ext::UV::Work.ptr, :int]
+          args = [::LibStorj::Ext::UV::Work.by_ref, :int]
 
           FFI::Function.new :void, args do |work_req_ptr|
             req = new work_req_ptr[:data]

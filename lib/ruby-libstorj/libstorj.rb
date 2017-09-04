@@ -9,7 +9,9 @@ module LibStorj
   require 'ruby-libstorj/ext/json_request'
   require 'ruby-libstorj/ext/get_bucket_request'
   require 'ruby-libstorj/ext/create_bucket_request'
+  require 'ruby-libstorj/ext/list_files_request'
   require 'ruby-libstorj/ext/bucket'
+  require 'ruby-libstorj/ext/file'
   require 'ruby-libstorj/ext/ext'
 
   require 'ruby-libstorj/env'

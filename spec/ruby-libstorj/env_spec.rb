@@ -2,7 +2,16 @@ require_relative '../helpers/storj_options'
 include LibStorjTest
 
 RSpec.describe LibStorj::Env do
+  def get_test_bucket_id(&block)
+    instance.get_buckets do |error, buckets|
+      test_bucket = buckets.find {|bucket| bucket.name == test_bucket_name}
+      throw(:no_bucket) unless test_bucket
+      block.call test_bucket.id
+    end
+  end
+
   let(:bucket_class) {::LibStorj::Ext::Storj::Bucket}
+  let(:file_class) {::LibStorj::Ext::Storj::File}
   let(:instance) do
     described_class.new(*default_options)
   end
@@ -91,25 +100,29 @@ RSpec.describe LibStorj::Env do
 
   describe '#get_buckets' do
     context 'without error' do
+      let(:bucket_names) {%w[bucket1 bucket2 bucket3]}
+
+      before do
+        bucket_names.each &instance.method(:create_bucket)
+      end
+
+      after do
+        bucket_names.each &instance.method(:delete_bucket)
+      end
+
       it 'yields a nil error and an array of buckets' do
         expect do |block| #{|block| instance.get_bucekts(&block)}.to yield_with_args
           instance.get_buckets do |error, buckets|
             expect(error).to be(nil)
-            expect(buckets).to be_an_instance_of(Array)
-            expect(buckets).to satisfy do |_buckets|
-              _buckets.all? do |bucket|
+            expect(buckets.length).to be(bucket_names.length)
+            expect(buckets).to satisfy do |buckets|
+              bucket_names = buckets.map(&:name)
+              names_match = bucket_names.all? &bucket_names.method(:include?)
+              are_all_buckets = buckets.all? do |bucket|
                 bucket.is_a? bucket_class
               end
-            end
-          end
-        end
-      end
 
-      it 'yields an array of buckets' do
-        instance.get_buckets do |error, buckets|
-          expect(buckets).to satisfy do |buckets|
-            buckets.all? do |bucket|
-              bucket.is_a? bucket_class
+              names_match && are_all_buckets
             end
           end
         end
@@ -125,14 +138,6 @@ RSpec.describe LibStorj::Env do
           instance.get_buckets(&block)
         end.to yield_with_args(/couldn't resolve host name/i, nil)
       end
-    end
-  end
-
-  def get_test_bucket_id(&block)
-    instance.get_buckets do |error, buckets|
-      test_bucket = buckets.find {|bucket| bucket.name == test_bucket_name}
-      throw(:no_bucket) unless test_bucket
-      block.call test_bucket.id
     end
   end
 
@@ -227,11 +232,63 @@ RSpec.describe LibStorj::Env do
         end
       end
 
-      describe 'malformed id error' do
-        let(:malformed_bucket_id) {'__ruby-libstorj_test-non-existant'}
+      xdescribe 'malformed id error' do
+        let(:malformed_bucket_id) {'this is not what a bucket id looks like'}
 
         it 'yields with a malformed id error' do
           instance.delete_bucket(malformed_bucket_id) do |error|
+            expect(error).to match(/bucket id is malformed/i)
+          end
+        end
+      end
+    end
+  end
+
+  describe '#list_files' do
+    # let(:test_bucket_name) {'bucket_with_files1'}
+    let(:test_bucket_name) {'test'}
+
+    context 'without error' do
+      # before do
+      #   instance.create_bucket test_bucket_name
+      # end
+      #
+      # after do
+      #   instance.delete_bucket test_bucket_name
+      # end
+
+      it 'yields with a nil error and an array of files' do
+        get_test_bucket_id do |test_bucket_id|
+          instance.list_files(test_bucket_id) do |error, files|
+            puts "error: #{error}"
+            puts "files: #{files}"
+            expect(error).to be(nil)
+            expect(files).to be_an_instance_of(Array)
+            expect(files).to satisfy do |files|
+              files.all? {|file| file.is_a? file_class}
+            end
+          end
+        end
+      end
+    end
+
+    context 'with error' do
+      describe 'external error' do
+        it 'yields with a non-nil error value and nil response' do
+          # (see https://tools.ietf.org/html/rfc2606)
+          instance.storj_env[:bridge_options][:host].write_string 'a.nonexistant.example'
+
+          expect do |block|
+            instance.list_files(test_bucket_name, &block)
+          end.to yield_with_args(/couldn't resolve host name/i, nil)
+        end
+      end
+
+      xdescribe 'malformed id error' do
+        let(:malformed_bucket_id) {'this is not what a bucket id looks like'}
+
+        it 'yields with a malformed id error' do
+          instance.list_files(malformed_bucket_id) do |error|
             expect(error).to match(/bucket id is malformed/i)
           end
         end

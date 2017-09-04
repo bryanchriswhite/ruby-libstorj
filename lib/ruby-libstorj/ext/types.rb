@@ -39,6 +39,18 @@ module LibStorj
                :decrypted, :bool
       end
 
+      class File < FFI::Struct
+        layout :created, :string,
+               :filename, :string,
+               :mimetype, :string,
+               :erasure, :string,
+               :size, :uint64,
+               :hmac, :string,
+               :id, :string,
+               :decrypted, :bool,
+               :index, :string
+      end
+
       class EncryptOptions < FFI::Struct
         layout :mnemonic, :pointer
       end

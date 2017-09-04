@@ -64,6 +64,19 @@ module LibStorj
       end
     end
 
+    def list_files(bucket_id, &block)
+      req_data_type = ::LibStorj::Ext::Storj::ListFilesRequest
+      after_work_cb = req_data_type.after_work_cb
+      ruby_handle = req_data_type.ruby_handle(&block)
+
+      uv_queue_and_run do
+        ::LibStorj::Ext::Storj::File.all @storj_env,
+                                          bucket_id,
+                                          ruby_handle,
+                                          after_work_cb
+      end
+    end
+
     def uv_queue_and_run
       reactor do |reactor|
         @chain = reactor.work do

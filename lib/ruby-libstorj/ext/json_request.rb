@@ -4,8 +4,8 @@ module LibStorj
       class JsonRequest < FFI::Struct
         CALLBACK = callback [:string, :string], :void
 
-        layout :http_options, HttpOptions.ptr,
-               :options, BridgeOptions.ptr,
+        layout :http_options, HttpOptions.by_ref,
+               :options, BridgeOptions.by_ref,
                :method, :string,
                :path, :string,
                :auth, :bool,
@@ -16,7 +16,7 @@ module LibStorj
                :handle, :pointer # void*
 
         def self.after_work_cb
-          args = [::LibStorj::Ext::UV::Work.ptr, :int]
+          args = [::LibStorj::Ext::UV::Work.by_ref, :int]
 
           FFI::Function.new :void, args do |work_req_ptr|
             req = self.new work_req_ptr[:data]

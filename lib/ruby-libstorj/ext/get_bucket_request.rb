@@ -35,10 +35,6 @@ module LibStorj
             buckets = ::LibStorj::Ext::Storj::Bucket
                           .pointer_to_array buckets_pointer,
                                             bucket_count
-            # if error.empty?
-            #   response_error = response.nil? ? nil : response['error']
-            #   error = response_error.nil? ? nil : response_error
-            # end
 
             yield error, buckets
           end

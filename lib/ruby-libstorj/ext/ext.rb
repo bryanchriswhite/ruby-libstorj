@@ -27,22 +27,22 @@ module LibStorj
       ffi_lib('storj')
 
       attach_function('get_info', 'storj_bridge_get_info', [
-          Env.ptr,
+          Env.by_ref,
           ::LibStorj::Ext::Storj::JsonRequest::CALLBACK,
           :pointer # uv_after_work_cb*
       # ::LibStorj::UV::
       ], :int)
 
       attach_function('destroy_env', 'storj_destroy_env', [
-          Env.ptr
+          Env.by_ref
       ], :int)
 
       attach_function('init_env', 'storj_init_env', [
-          BridgeOptions.ptr,
-          EncryptOptions.ptr,
-          HttpOptions.ptr,
-          LogOptions.ptr
-      ], Env.ptr)
+          BridgeOptions.by_ref,
+          EncryptOptions.by_ref,
+          HttpOptions.by_ref,
+          LogOptions.by_ref
+      ], Env.by_ref)
     end
 
     module UV
