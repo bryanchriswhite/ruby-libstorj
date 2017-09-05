@@ -10,6 +10,16 @@ RSpec.describe LibStorj::Env do
     end
   end
 
+  def get_test_file_id(&block)
+    get_test_bucket_id do |test_bucket_id|
+      instance.list_files test_bucket_id do |error, files|
+        test_file = files.find {|file| file.name == test_file_name}
+        throw(:no_file) unless test_file
+        block.call test_file.id, test_bucket_id
+      end
+    end
+  end
+
   let(:bucket_class) {::LibStorj::Ext::Storj::Bucket}
   let(:file_class) {::LibStorj::Ext::Storj::File}
   let(:instance) do
@@ -260,8 +270,6 @@ RSpec.describe LibStorj::Env do
       it 'yields with a nil error and an array of files' do
         get_test_bucket_id do |test_bucket_id|
           instance.list_files(test_bucket_id) do |error, files|
-            puts "error: #{error}"
-            puts "files: #{files}"
             expect(error).to be(nil)
             expect(files).to be_an_instance_of(Array)
             expect(files).to satisfy do |files|
@@ -291,6 +299,20 @@ RSpec.describe LibStorj::Env do
           instance.list_files(malformed_bucket_id) do |error|
             expect(error).to match(/bucket id is malformed/i)
           end
+        end
+      end
+    end
+  end
+
+  describe '#resolve_file' do
+    let(:test_bucket_name) {'test'}
+    let(:test_file_name) {'test.rb'}
+
+    context 'without error' do
+      it 'yields a nil error and a file' do
+        get_test_file_id do |test_file_id, test_bucket_id|
+          instance.resolve_file test_bucket_id,
+                                test_file_id
         end
       end
     end

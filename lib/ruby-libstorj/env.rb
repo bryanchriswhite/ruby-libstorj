@@ -71,9 +71,42 @@ module LibStorj
 
       uv_queue_and_run do
         ::LibStorj::Ext::Storj::File.all @storj_env,
-                                          bucket_id,
-                                          ruby_handle,
-                                          after_work_cb
+                                         bucket_id,
+                                         ruby_handle,
+                                         after_work_cb
+      end
+    end
+
+    def resolve_file(bucket_id, file_id, &block)
+      download_state = ::LibStorj::Ext::Storj::DownloadState.new
+      file_descriptor = FFI::MemoryPointer.new(:char, 10000)
+
+      require 'pry'
+      progress_cb = FFI::Function.new :void, %i[double uint64 uint64 pointer] do
+      |progress, bytes, total_bytes|
+        # binding.pry
+      end
+
+      finished_cb = FFI::Function.new :void, %i[int pointer pointer] do
+      |status, fd, handle|
+        # binding.pry
+        FFI::Function.new(:void, [], handle).call
+      end
+
+      ruby_handle = FFI::Function.new :void, [] do
+        # binding.pry
+        yield if block
+      end
+
+      uv_queue_and_run do
+        ::LibStorj::Ext::Storj::File.resolve @storj_env,
+                                             download_state,
+                                             bucket_id,
+                                             file_id,
+                                             file_descriptor,
+                                             ruby_handle,
+                                             progress_cb,
+                                             finished_cb
       end
     end
 
