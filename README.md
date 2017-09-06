@@ -6,14 +6,14 @@ ruby-libstorj: Ruby bindings for libstorj
 ### Install gem:
 + in `Gemfile`:
     ```ruby
-    gem 'ruby_libstorj'
+    gem 'ruby-libstorj'
     ```
     
     followed by a `bundle install` (of course)
     
 + with `gem`:
     ```bash
-      gem install ruby_libstorj
+      gem install ruby-libstorj
     ```
     
 + from source:
@@ -42,6 +42,9 @@ This project strives to conform to the ruby  and rubygems standards and conventi
   - task runner
 + `rspec` (see http://rspec.info/documentation/)
   - test framework
++ `guard` (see https://github.com/guard/guard)
+  - task automation
+    - rspec - file watching
 
 ### Install ruby dependencies:
 ```bash
@@ -77,12 +80,22 @@ rake
     Maybe you need/want to pass args to `gem`, or maybe `rake install` doesn't work on your system:
     
     ```bash
-    gem install --local ./ruby_libstorj-*.gem  --no-ri --no-rdoc  
+    gem install --local ./ruby-libstorj-*.gem  --no-ri --no-rdoc  
     ```
 
-### Run tests:
+### Testing:
+#### First create spec/helpers/options.yml !
+For the moment, the test suite doesn't start it's own mock backend but it does parse whatever's in the `spec/helpsers/options.yml` file to initialize `LibStorj::Ext::Storj::Env` to connect via http/https.
+
+You can copy [`spec/helpers/options.yml.example`](./spec/helpers/options.yml.example) and modify it for your use:
+```bash
+cp spec/helpers/options.yml.example spec/helpers/options.yml && \
+vim spec/helpers/options.yml   # or whatever
+```
+`spec/helpers/options.yml` should be in the [`.gitignore`](./.gitignore) so you shouldn't have to worry about accidentally committing it.
+
 #### A quick note on rspec formatters:
-The "progress" (aka "dots") formatter is the default but it's not my peronsal favorite for development.
+The "progress" formatter is the default.
 This repo makes it easy to change formatters when invoking rspec via `rspec` or `rake` binaries.
 
 With that said, here are your options:
@@ -97,34 +110,59 @@ $ rspec --help | less
                          custom formatter class name
 ```
 
+#### Test coverage reporting:
+This repo uses [`simplecov`](https://github.com/colszowka/simplecov) to generage test coverage reports on **each** test run.
+
+When executing tests via rake, a `file://` url to the coverage report is printed for easy copy/pasting into a browser;
+further, if you want to automatically open it (via [`launchy`](https://github.com/copiousfreetime/launchy)) you may pass `y` or `yes` as the second rake argument to either `:spec` or `:test` tasks.
+
+For example usages see "with `rake`" below.
+
+#### Running the tests:
 + with `rake`:
     ```bash
     rake test
     
+    # rake test[<formatter>,<open coverage>]
+    #
     # pass <formatter> to rspec as `--format <formatter>` 
-    # rake test[<formatter]
     #
     # e.g. (the following are all equivalent):
     # rake test[doc]
     # rake test[d]
     # rake spec[d]
+    #
+    # open coverage report automatically
+    #
+    # e.g. (also equivalent; using default formatter):
+    # rake test[,yes]
+    # rake test[,y]
+    #
+    # do both
+    #
+    # rake test[d,y]
     ```
     
-    Keep in mind that rake will also run any dependencies of the `:test` task
+    Keep in mind that rake will also run any dependencies of the `:test` (or `:spec`) task
     
-    _(e.g. Start a web server or db server or something)_
+    _(e.g. start a web server, open coverage report, etc.)_
 + with `rspec`:
     ```bash
     rspec   # cli args can be passed directly to rspec
-    ```
     
-    Change the rspec formatter:
-    
-    ```bash
-    rspec --format doc   # use the 'document' rspec formatter
-    
-    # short version
-    # rspec -f d
+    # Change the rspec formatter:
+    #
+    # rspec --format doc  # use the 'document' rspec formatter
+    # rspec -f d          # short version
+    #
+    # Test specific files:
+    #
+    # rspec spec/ruby-libstorj/env_spec.rb      # single file
+    # rspec spec/ruby-libstorj/{env,libstorj}*  # glob of files
+    #
+    # Test specific examples:
+    #
+    # rspec spec/ruby-libstorj/env_spec.rb:15   # run test(s) containing line 15
     ```
     (see `rspec --help | less`)
     
@@ -152,18 +190,19 @@ $ rspec --help | less
    ```c
    /* example.c */
    #include <uv.h>
-   
-   
+   ...
+   // implemented elsewhere
+   uv_work_t* my_work_factory(void* handle);
+   ...
+   handle_wrapper
    ...
    extern "C"
    int example_queue_work(void* handle, uv_after_work_cb cb)
    {
-       # example modified from storj_bridge_get_info
-       uv_loop_t* loop = &uv_default_loop();
-       uv_work_t *work = json_request_work_new(env,"GET", "/", NULL,
-                                               false, handle);
+       uv_loop_t* loop = uv_default_loop();
+       uv_work_t *work = my_work_factory(handle);
    
-       return uv_queue_work(loop, (uv_work_t*) work, json_request_worker, cb);
+       return uv_queue_work(loop, work, my_worker, cb);
    }
    ```
     
@@ -193,6 +232,10 @@ $ rspec --help | less
    Example.run  #=> segmentation fault
    ```
    _*`ffi_lib` automatically adds the conventional "lib" prefix to args which are not absolute paths_
+   
+   
+   It seems to be the case that calls to `uv_default_loop()` made from within C-libstorj point to a different location than the default loop from ruby-livub.
+   It may be the case that C-libuv is being loaded twice, one linked through C-libstorj and the other through ruby-libuv bindings or something; more digging required.
    
    #### The solution
    Instead of calling `uv_run` directly, if we let the ruby `libuv` gem do it for us, we can call `uv_queue_work` in C as much as we want.

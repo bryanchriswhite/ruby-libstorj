@@ -1,6 +1,6 @@
 # use local file rather than require through gem to run local code
-# i.e. `require 'ruby_libstorj/...'`
-require_relative './lib/ruby_libstorj/arg_forwarding_task'
+# i.e. `require 'ruby-libstorj/...'`
+require_relative './lib/ruby-libstorj/arg_forwarding_task'
 
 # NB: using begin/rescue so that you can use your
 #     Rakefile in an environment where RSpec is
@@ -8,8 +8,7 @@ require_relative './lib/ruby_libstorj/arg_forwarding_task'
 # (see https://relishapp.com/rspec/rspec-core/docs/command-line/rake-task)
 begin
   require 'rspec/core/rake_task'
-
-  RSpec::Core::RakeTask.new(:spec, %i[format] => []) do |t, args|
+  RSpec::Core::RakeTask.new(:rspec, [:format] => []) do |t, args|
     rspec_opts = ''
 
     format_name = args.values_at(*%i[format])
@@ -25,27 +24,42 @@ begin
     t.rspec_opts = rspec_opts unless rspec_opts.empty?
   end
 
-  LibStorj::ArgForwardingTask.new(:spec, task_aliases: %i[test], args_deps_hash: {
-      %i[format] => []
-  })
+  LibStorj::ArgForwardingTask.new :spec,
+                                  alias_names: [:test],
+                                  args_deps_hash: {
+                                      %i[format open_coverage] => [:rspec]
+                                  } do |t, args|
+    ### NB: this task only prints the file url line after `simplecov`s output.
+    #       and optionally open it in the default browser. It depends on :rspec,
+    #       which ensures that the tests get run and that this runs after.
+    coverage_url = "file:///#{__dir__}/coverage/index.html"
+    open_coverage = (args.to_hash[:open_coverage] =~ /^y(es)?$/)
+    if open_coverage
+      puts "Opening: #{coverage_url}"
+      require 'launchy'
+      Launchy.open coverage_url
+    else
+      puts "Open in a browser: #{coverage_url}"
+    end
+  end
 rescue LoadError
   # supress `LoadError` exceptions...
 end
 
 # Register the task that's run when you `rake compile`
 require 'rake/extensiontask'
-Rake::ExtensionTask.new 'ruby_libstorj'
+Rake::ExtensionTask.new 'ruby-libstorj'
 
 # TODO: everything that follows... but better
 LibStorj::ArgForwardingTask.new(:build, args_deps_hash: {
     %i[no-test] => []
-}) do |t, args|
+}) do |t, args, deps|
   Rake::Task[:spec].invoke if args.to_hash[:'no-test'].nil?
 
   directory 'tmp'
 
-  sh 'gem build ./ruby_libstorj.gemspec'
-  sh 'mv ./ruby_libstorj-*.gem ./tmp/'
+  sh 'gem build ./ruby-libstorj.gemspec'
+  sh 'mv ./ruby-libstorj-*.gem ./tmp/'
 end
 
 LibStorj::ArgForwardingTask.new(:install, args_deps_hash: {
@@ -53,7 +67,7 @@ LibStorj::ArgForwardingTask.new(:install, args_deps_hash: {
 }) do |t, args|
   Rake::Task[:build].invoke(*args.to_a)
 
-  sh 'gem install --local ./tmp/ruby_libstorj-*.gem \
+  sh 'gem install --local ./tmp/ruby-libstorj-*.gem \
                         --no-ri \
                         --no-rdoc'
 end

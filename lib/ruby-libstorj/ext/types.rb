@@ -16,8 +16,7 @@ module LibStorj
 
     module Curl
       extend FFI::Library
-
-      require 'ruby_libstorj/ext/curl_code'
+      require 'ruby-libstorj/ext/curl_code'
 
       enum(:curl_code, CURL_CODES)
     end
@@ -33,7 +32,7 @@ module LibStorj
                :pass, :pointer
       end
 
-      class BucketMeta < FFI::Struct
+      class Bucket < FFI::Struct
         layout :created, :string,
                :name, :string,
                :id, :string,
@@ -58,42 +57,11 @@ module LibStorj
                :level, :int
       end
 
-      class GetBucketRequest < FFI::Struct
-        layout :http_options, HttpOptions.ptr,
-               :encrypt_options, EncryptOptions.ptr,
-               :options, BridgeOptions.ptr,
-               :method, :string,
-               :path, :string,
-               :auth, :bool,
-               :body, :pointer,     # struct json_object *body;
-               :response, :pointer, # struct json_object *body;
-               :buckets, BucketMeta.ptr,
-               :total_buckets, :uint32,
-               :error_code, :int,
-               :status_code, :int,
-               :handle, :pointer    # void*
-      end
-
-      JSON_REQUEST_CALLBACK = callback [:string, :string], :void
-
-      class JsonRequest < FFI::Struct
-        layout :http_options, HttpOptions.ptr,
-               :options, BridgeOptions.ptr,
-               :method, :string,
-               :path, :string,
-               :auth, :bool,
-               :body, :pointer,     # struct json_object *body;
-               :response, :pointer, # struct json_object *response;
-               :error_code, :int,
-               :status_code, :int,
-               :handle, :pointer    # void*
-      end
-
       class Env < FFI::Struct
-        layout :bridge_options, BridgeOptions.ptr,
-               :encrypt_options, EncryptOptions.ptr,
-               :http_options, HttpOptions.ptr,
-               :log_options, LogOptions.ptr,
+        layout :bridge_options, BridgeOptions.by_ref,
+               :encrypt_options, EncryptOptions.by_ref,
+               :http_options, HttpOptions.by_ref,
+               :log_options, LogOptions.by_ref,
                :tmp_path, :pointer,
                :loop, :pointer, # uv_loop_t*
                :log, :pointer # storj_log_levels_t*
@@ -119,7 +87,7 @@ module LibStorj
       ]
 
       class Work < FFI::Struct
-        layout :data, :pointer,   # void*
+        layout :data, :pointer, # void*
                # read-only
                :type, :uv_work_req,
                # private

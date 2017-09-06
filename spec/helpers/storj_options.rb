@@ -1,6 +1,6 @@
 module LibStorjTest
   require 'yaml'
-  require 'ruby_libstorj'
+  require 'ruby-libstorj'
 
   def build_options(type_map)
     options_yml = YAML.load_file "#{__dir__}/options.yml"
