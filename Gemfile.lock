@@ -61,7 +61,6 @@ GEM
     rb-fsevent (0.10.2)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
-    rice (2.1.1)
     rspec (3.6.0)
       rspec-core (~> 3.6.0)
       rspec-expectations (~> 3.6.0)
@@ -101,7 +100,6 @@ DEPENDENCIES
   pry-byebug!
   rake!
   rake-compiler!
-  rice!
   rspec!
   ruby-libstorj!
   simplecov!

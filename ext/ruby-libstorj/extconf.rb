@@ -1,5 +1,4 @@
-# require 'mkmf'
-require 'mkmf-rice'
+require 'mkmf'
 REQUIRED_LIBS = %w[curl uv storj]
 
 REQUIRED_LIBS.each do |lib_name|
