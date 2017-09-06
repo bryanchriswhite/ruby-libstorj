@@ -54,4 +54,28 @@ RSpec.describe LibStorj do
       end
     end
   end
+
+  describe '.mnemonic_generate' do
+    let(:mnemonic) do
+      described_class.mnemonic_generate strength
+    end
+
+    context 'with minimum strength' do
+      let(:strength) {128}
+
+      it 'returns a new mnemonic longer than 50 characters' do
+        actual = mnemonic
+        expect(actual.length).to be > 50
+      end
+    end
+
+    context 'with maximum strength' do
+      let(:strength) {256}
+
+      it 'returns a new mnemonic longer than 100 characters' do
+        actual = mnemonic
+        expect(actual.length).to be > 100
+      end
+    end
+  end
 end
