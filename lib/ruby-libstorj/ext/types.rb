@@ -51,61 +51,61 @@ module LibStorj
                :index, :string
       end
 
-      # class UploadState < FFI::Struct
-      #   layout :env, :pointer,
-      #          :shard_concurrency, :uint32,
-      #          :index, :string,
-      #          :file_name, :string,
-      #          :file_id, :string,
-      #          :encrypted_file_name, :string,
-      #          :original_file, :pointer, # FILE
-      #          :file_size, :uint64,
-      #          :bucket_id, :string,
-      #          :bucket_key, :string,
-      #          :completed_shards, :uint32,
-      #          :total_shards, :uint32,
-      #          :total_data_shards, :uint32,
-      #          :total_parity_shards, :uint32,
-      #          :shard_size, :uint64,
-      #          :total_bypes, :uint64,
-      #          :uploaded_bytes, :uint64,
-      #          :exclude, :string,
-      #          :frame_id, :string,
-      #          :hmac_id, :string,
-      #          :encryption_key, :uint8,
-      #          :encryption_ctr, :uint8,
-      #          :rs, :bool,
-      #          :awaiting_parity_shards, :bool,
-      #          :parity_file_path, :string,
-      #          :parity_file, :pointer, # FILE
-      #          :encrypted_file_path, :string,
-      #          :encrypted_file, :pointer, # FILE
-      #          :creating_encrypted_file, :bool,
-      #          :requesting_frame, :bool,
-      #          :completed_upload, :bool,
-      #          :creating_bucket_entry, :bool,
-      #          :received_all_pointers, :bool,
-      #          :final_callback_called, :bool,
-      #          :canceled, :bool,
-      #          :bucket_verified, :bool,
-      #          :file_verified, :bool,
-      #          :progress_finished, :bool,
-      #          :push_shard_limit, :int,
-      #          :push_frame_limit, :int,
-      #          :prepare_frame_limit, :int,
-      #          :frame_request_count, :int,
-      #          :add_bucket_entry_count, :int,
-      #          :bucket_verify_count, :int,
-      #          :file_verify_count, :int,
-      #          :create_encrypted_file_count, :int,
-      #          :progress_cb, :pointer, # storj_progress_cb
-      #          :finished_cb, :pointer, # storj_finished_upload_cb
-      #          :error_status, :int,
-      #          :log, :pointer, # storj_log_levels_t
-      #          :handle, :pointer,
-      #          :shard, :pointer, # shard_tracker_t
-      #          :pending_work_count, :int
-      # end
+      class UploadState < FFI::Struct
+        layout :env, :pointer,
+               :shard_concurrency, :uint32,
+               :index, :string,
+               :file_name, :string,
+               :file_id, :string,
+               :encrypted_file_name, :string,
+               :original_file, :pointer, # FILE
+               :file_size, :uint64,
+               :bucket_id, :string,
+               :bucket_key, :string,
+               :completed_shards, :uint32,
+               :total_shards, :uint32,
+               :total_data_shards, :uint32,
+               :total_parity_shards, :uint32,
+               :shard_size, :uint64,
+               :total_bypes, :uint64,
+               :uploaded_bytes, :uint64,
+               :exclude, :string,
+               :frame_id, :string,
+               :hmac_id, :string,
+               :encryption_key, :uint8,
+               :encryption_ctr, :uint8,
+               :rs, :bool,
+               :awaiting_parity_shards, :bool,
+               :parity_file_path, :string,
+               :parity_file, :pointer, # FILE
+               :encrypted_file_path, :string,
+               :encrypted_file, :pointer, # FILE
+               :creating_encrypted_file, :bool,
+               :requesting_frame, :bool,
+               :completed_upload, :bool,
+               :creating_bucket_entry, :bool,
+               :received_all_pointers, :bool,
+               :final_callback_called, :bool,
+               :canceled, :bool,
+               :bucket_verified, :bool,
+               :file_verified, :bool,
+               :progress_finished, :bool,
+               :push_shard_limit, :int,
+               :push_frame_limit, :int,
+               :prepare_frame_limit, :int,
+               :frame_request_count, :int,
+               :add_bucket_entry_count, :int,
+               :bucket_verify_count, :int,
+               :file_verify_count, :int,
+               :create_encrypted_file_count, :int,
+               :progress_cb, :pointer, # storj_progress_cb
+               :finished_cb, :pointer, # storj_finished_upload_cb
+               :error_status, :int,
+               :log, :pointer, # storj_log_levels_t
+               :handle, :pointer,
+               :shard, :pointer, # shard_tracker_t
+               :pending_work_count, :int
+      end
 
       class DownloadState < FFI::Struct
         layout :total_bytes, :uint64,

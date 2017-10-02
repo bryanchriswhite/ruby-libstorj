@@ -60,6 +60,15 @@ module LibStorj
             FINISHED_DOWNLOAD_CALLBACK, # finished_cb
         ], :int)
 
+        attach_function('store', 'storj_bridge_store_file', [
+            Env.by_ref,
+            ::LibStorj::Ext::Storj::UploadState.by_ref,
+            ::LibStorj::Ext::Storj::UploadOptions.by_ref,
+            :pointer, # handle
+            PROGRESS_CALLBACK, # progress_cb
+            FINISHED_DOWNLOAD_CALLBACK, # finished_cb
+        ], :int)
+
         private :resolve
       end
     end

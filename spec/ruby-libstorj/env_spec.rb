@@ -317,4 +317,36 @@ RSpec.describe LibStorj::Env do
       end
     end
   end
+
+  describe '#store_file' do
+    require 'pry'
+    puts 'hello from store_file test!!'
+    let(:test_bucket_name) {'test'}
+    let(:test_file_path) {"#{__dir__}/../../README.md"}
+    let(:progress_block) {Proc.new do
+      # binding.pry
+      puts 'hello from progress_block'
+    end}
+
+    context 'without error' do
+      it 'yields a nil error and a file' do
+        puts 'in it'
+        get_test_bucket_id do |test_bucket_id|
+          instance.store_file test_bucket_id,
+                              test_file_path,
+                              progress_block do |*args|
+            # binding.pry
+            puts 'hello from finished'
+          end
+        end
+        puts 'done with it'
+      end
+    end
+  end
+
+  # describe 'test' do
+  #   it 'works' do
+  #     expect(LibStorj.test_me).to be('working!')
+  #   end
+  # end
 end
