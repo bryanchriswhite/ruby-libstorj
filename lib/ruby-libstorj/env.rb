@@ -18,7 +18,7 @@ module LibStorj
     def get_info(&block)
       ruby_handle = ::LibStorj::Ext::Storj::JsonRequest.ruby_handle(&block)
       after_work_cb = ::LibStorj::Ext::Storj::JsonRequest.after_work_cb do |error|
-        yield error if block
+        yield error if block_given?
       end
 
       uv_queue_and_run do
@@ -31,7 +31,7 @@ module LibStorj
     def delete_bucket(bucket_id, &block)
       after_work_cb = ::LibStorj::Ext::Storj::JsonRequest.after_work_cb
       ruby_handle = ::LibStorj::Ext::Storj::JsonRequest.ruby_handle do |error|
-        yield error if block
+        yield error if block_given?
       end
 
       uv_queue_and_run do
@@ -79,28 +79,27 @@ module LibStorj
       end
     end
 
-    def resolve_file(bucket_id, file_id, &block)
+    def resolve_file(bucket_id, file_id, file_path, progress_proc = nil)
       download_state = ::LibStorj::Ext::Storj::DownloadState.new
-      # file_descriptor = FFI::MemoryPointer.new(:char, 10000)
+      file_descriptor = ::LibStorj::Ext::LibC.fopen(file_path, 'w')
 
-      require 'pry'
       progress_cb = FFI::Function.new :void, %i[double uint64 uint64 pointer] do
-      |progress, bytes, total_bytes|
-        # binding.pry
+      |progress, downloaded_bytes, total_bytes, handle|
+        progress_proc.call progress, downloaded_bytes, total_bytes if progress_proc
       end
 
-      finished_cb = FFI::Function.new :void, %i[int pointer pointer] do
-      |status, fd, handle|
-        # binding.pry
-        FFI::Function.new(:void, [], handle).call
+      finished_cb = FFI::Function.new :void, %i[int pointer pointer] do |status, file_id, handle|
+        # do error handling based on status
+        yield file_id if block_given?
       end
 
+      # ruby_handle = FFI::MemoryPointer::NULL
       ruby_handle = FFI::Function.new :void, [] do
-        # binding.pry
-        yield if block
+        puts 'in ruby_handle'
       end
 
       uv_queue_and_run do
+        puts 'in uv_queue_and_run'
         ::LibStorj::Ext::Storj::File.resolve @storj_env,
                                              download_state,
                                              bucket_id,
@@ -109,42 +108,35 @@ module LibStorj
                                              ruby_handle,
                                              progress_cb,
                                              finished_cb
+        puts 'after uv_queue_and_run'
       end
+      puts 'outside of uv_queue_and_run'
     end
 
-    def store_file(bucket_id, file_path, progress_block = nil, &block)
+    def store_file(bucket_id, file_path, progress_proc = nil, options = {})
+      options = progress_proc if progress_proc.is_a? Hash
+      default_options = {
+          bucket_id: bucket_id,
+          file_path: file_path,
+      }
+      options = options.merge(default_options) {|key, oldval| oldval}
+
       upload_state = ::LibStorj::Ext::Storj::UploadState.new
-      upload_options = ::LibStorj::Ext::Storj::UploadOptions.new bucket_id: bucket_id,
-                                                                 file_path: file_path
-      # upload_options = FFI::MemoryPointer::NULL
+      upload_options =
+          ::LibStorj::Ext::Storj::UploadOptions.new options
 
       progress_cb = FFI::Function.new :void, %i[double uint64 uint64 pointer] do
       |progress, bytes, total_bytes|
-        # binding.pry
-        puts 'hello from progress_cb'
-        progress_block.call progress, bytes, total_bytes if progress_block
+        progress_proc.call progress, bytes, total_bytes if progress_proc
       end
 
       finished_cb = FFI::Function.new :void, %i[int pointer pointer] do
-      |status, fd, handle|
-        # binding.pry
-        puts 'hello from finished_cb'
-        FFI::Function.new(:void, [], handle).call
+      |status, file_id, handle|
+        # do error handling based on status
+        yield file_id if block_given?
       end
 
-      ruby_handle = FFI::Function.new :void, [] do
-        # binding.pry
-        puts 'hello from ruby_handle'
-        yield if block
-      end
-
-      {upload_state: upload_state, upload_options: upload_options}.each do |name, value|
-        if value.is_a? FFI::Struct
-          puts "#{name}: #{value.to_ptr.address.to_s(16)}"
-        else
-          puts "#{name}: #{value.address.to_s(16)}"
-        end
-      end
+      ruby_handle = FFI::MemoryPointer::NULL
 
       uv_queue_and_run do
         ::LibStorj::Ext::Storj::File.store @storj_env,
@@ -154,9 +146,6 @@ module LibStorj
                                            progress_cb,
                                            finished_cb
 
-        upload_state.values_at(%i[original_file parity_file encrypted_file progress_cb finished_cb handle shard]).each do |pointer|
-          puts "address: #{pointer.address.to_s(16)}"
-        end
       end
     end
 

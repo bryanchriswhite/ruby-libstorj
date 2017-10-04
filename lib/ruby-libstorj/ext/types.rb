@@ -67,7 +67,7 @@ module LibStorj
                :total_data_shards, :uint32,
                :total_parity_shards, :uint32,
                :shard_size, :uint64,
-               :total_bypes, :uint64,
+               :total_bytes, :uint64,
                :uploaded_bytes, :uint64,
                :exclude, :string,
                :frame_id, :string,

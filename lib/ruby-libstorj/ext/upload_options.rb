@@ -3,17 +3,20 @@ module LibStorj
     module Storj
       class UploadOptions < FFI::Struct
         layout :prepare_frame_limit, :int,
-                :push_frame_limit, :int,
-                :push_shard_limit, :int,
-                :rs, :bool,
-                :index, :pointer, # char*
-                :bucket_id, :pointer, # char*
-                :file_name, :pointer, # char*
-                :fd, :pointer # FILE*
+               :push_frame_limit, :int,
+               :push_shard_limit, :int,
+               :rs, :bool,
+               :index, :pointer, # char*
+               :bucket_id, :pointer, # char*
+               :file_name, :pointer, # char*
+               :fd, :pointer # FILE*
 
         def initialize(options)
           bucket_id, file_path, file_name, index = options.values_at *(%i[bucket_id file_path file_name index])
-          raise Errno:ENOENT.new(file_path) unless ::File.exists? file_path
+          if file_path.nil? || !::File.exists?(file_path)
+            raise Errno::ENOENT.new(file_path || 'nil')
+          end
+
           file_name = ::File.basename(file_path) if !file_name
           super()
 

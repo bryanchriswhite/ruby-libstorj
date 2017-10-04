@@ -68,8 +68,6 @@ module LibStorj
             PROGRESS_CALLBACK, # progress_cb
             FINISHED_DOWNLOAD_CALLBACK, # finished_cb
         ], :int)
-
-        private :resolve
       end
     end
   end
