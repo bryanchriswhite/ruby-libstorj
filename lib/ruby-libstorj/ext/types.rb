@@ -108,6 +108,15 @@ module LibStorj
       end
 
       class DownloadState < FFI::Struct
+        def log
+          members.each do |member|
+            value = self[member]
+            puts "download state address: #{self.to_ptr.address.to_s(16)}"
+            next puts "#{member}: #{value}" unless value.is_a?(FFI::Pointer)
+            next puts "#{member} address: #{value.address.to_s(16)}" if value.respond_to? :address
+            puts "#{member} pointer address: #{value.address.to_s(16)}"
+          end
+        end
         layout :total_bytes, :uint64,
                :requesting_info, :bool,
                :info_fail_count, :uint32,

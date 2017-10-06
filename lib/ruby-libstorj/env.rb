@@ -85,21 +85,29 @@ module LibStorj
 
       progress_cb = FFI::Function.new :void, %i[double uint64 uint64 pointer] do
       |progress, downloaded_bytes, total_bytes, handle|
+        puts
+        puts 'progress log'
+        download_state.log
         progress_proc.call progress, downloaded_bytes, total_bytes if progress_proc
       end
 
       finished_cb = FFI::Function.new :void, %i[int pointer pointer] do |status, file_id, handle|
         # do error handling based on status
+        puts
+        puts 'finished log'
+        download_state.log
         yield file_id if block_given?
       end
 
       # ruby_handle = FFI::MemoryPointer::NULL
       ruby_handle = FFI::Function.new :void, [] do
-        puts 'in ruby_handle'
       end
 
       uv_queue_and_run do
-        puts 'in uv_queue_and_run'
+        puts
+        puts 'pre log'
+        download_state.log
+        ::LibStorj::Ext::LibC.raise(10)
         ::LibStorj::Ext::Storj::File.resolve @storj_env,
                                              download_state,
                                              bucket_id,
@@ -108,9 +116,7 @@ module LibStorj
                                              ruby_handle,
                                              progress_cb,
                                              finished_cb
-        puts 'after uv_queue_and_run'
       end
-      puts 'outside of uv_queue_and_run'
     end
 
     def store_file(bucket_id, file_path, progress_proc = nil, options = {})

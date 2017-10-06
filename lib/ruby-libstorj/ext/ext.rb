@@ -2,9 +2,10 @@ module LibStorj
   module Ext
     module LibC
       extend FFI::Library
-      ffi_lib('libc')
+      ffi_lib('c')
 
       attach_function('fopen', [:string, :string], :pointer)
+      attach_function('raise', [:int], :int)
     end
 
     module Curl
