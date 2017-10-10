@@ -104,7 +104,8 @@ module LibStorj
                :log, :pointer, # storj_log_levels_t
                :handle, :pointer,
                :shard, :pointer, # shard_tracker_t
-               :pending_work_count, :int
+               :pending_work_count, :int,
+               :fake_member, :pointer
       end
 
       class DownloadState < FFI::Struct

@@ -136,22 +136,20 @@ module LibStorj
         progress_proc.call progress, bytes, total_bytes if progress_proc
       end
 
-      finished_cb = FFI::Function.new :void, %i[int pointer pointer] do
+      finished_cb = FFI::Function.new :void, %i[int string pointer] do
       |status, file_id, handle|
         # do error handling based on status
         yield file_id if block_given?
       end
 
-      ruby_handle = FFI::MemoryPointer::NULL
-
       uv_queue_and_run do
+        # upload_state[:env] = @storj_env
         ::LibStorj::Ext::Storj::File.store @storj_env,
                                            upload_state,
                                            upload_options,
-                                           ruby_handle,
+                                           FFI::MemoryPointer::NULL,
                                            progress_cb,
                                            finished_cb
-
       end
     end
 

@@ -255,7 +255,90 @@ RSpec.describe LibStorj::Env do
     end
   end
 
+  xdescribe '#resolve_file' do
+    let(:test_bucket_name) {'test'}
+    let(:test_file_name) {'test.data'}
+    let(:test_file_path) {'/home/user/Projects/ruby-libstorj/spec/helpers/download.data'} #{File.join %W(#{__dir__} .. helpers download.data)}
+    let(:expected_hash) {File.read test_file_path}
+    let(:test_file_hash) {
+      data = File.read test_file_path
+      OpenSSL::Digest::SHA256.hexdigest data
+    }
+    let(:progress_block) {Proc.new do
+      # binding.pry
+      puts 'hello from progress_block'
+    end}
+
+    after :each do
+      if File.exists? test_file_path
+        File.unlink test_file_path
+      end
+    end
+
+    context 'without error' do
+      it 'downloads a file with the same sha256sum as the uploaded test data' do
+        puts 'doing it'
+        get_test_file_id do |test_bucket_id, test_file_id|
+          instance.resolve_file test_bucket_id,
+                                test_file_id,
+                                test_file_path,
+                                progress_block do |*args|
+            puts 'in finished callback'
+            # binding.pry
+            # ensure this block is called
+            puts 'SANITY CHECK'
+            # test_file_hash.should be.equal(expected_hash)
+            puts '!SANITY CHECK'
+            puts 'end of test'
+          end
+          puts 'done'
+        end
+        puts 'more done'
+      end
+    end
+  end
+
+  describe '#store_file' do
+    let(:test_bucket_name) {'test'}
+    let(:test_file_name) {'test.data'}
+    let(:test_file_path) {File.join %W(#{__dir__} .. helpers upload.data)}
+    let(:options) {{
+        file_name: test_file_name
+    }}
+    let(:progress_block) {Proc.new do
+      # ensure this block is called
+    end}
+
+    before do
+      done = nil
+      instance.create_bucket test_bucket_name do
+        done = true
+      end
+
+      wait_for(done).to be_truthy
+    end
+
+    context 'without error' do
+      it 'uploads a file of the same size to the the specified bucket' do
+        get_test_bucket_id do |test_bucket_id|
+          instance.store_file test_bucket_id,
+                              test_file_path,
+                              options,
+                              progress_block do |file_id|
+            if file_id.nil?
+              fail %q(Please ensure the test file doesn't already exist; TODO: automate this)
+            end
+
+            expect(file_id).to match(/\w+/i)
+            # ensure this block is called
+          end
+        end
+      end
+    end
+  end
+
   describe '#list_files' do
+    puts 'NB: `#list_files` test requires files be added to the `test` bucket; TODO: automate this'
     # let(:test_bucket_name) {'bucket_with_files1'}
     let(:test_bucket_name) {'test'}
 
@@ -305,74 +388,4 @@ RSpec.describe LibStorj::Env do
     end
   end
 
-  describe '#resolve_file' do
-    let(:test_bucket_name) {'test'}
-    let(:test_file_name) {'test.data'}
-    let(:test_file_path) {'/home/user/Projects/ruby-libstorj/spec/helpers/download.data'} #{File.join %W(#{__dir__} .. helpers download.data)}
-    let(:expected_hash) {File.read test_file_path}
-    let(:test_file_hash) {
-      data = File.read test_file_path
-      OpenSSL::Digest::SHA256.hexdigest data
-    }
-    let(:progress_block) {Proc.new do
-      # binding.pry
-      puts 'hello from progress_block'
-    end}
-
-    after :each do
-      if File.exists? test_file_path
-        File.unlink test_file_path
-      end
-    end
-
-    context 'without error' do
-      it 'downloads a file with the same sha256sum as the uploaded test data' do
-        puts 'doing it'
-        # get_test_file_id do |test_bucket_id, test_file_id|
-          instance.resolve_file '3fad7481bca308c9eb306274',#test_bucket_id,
-                                'bc6eaa4b017c6dec2016dacf',#test_file_id,
-                                test_file_path,
-                                progress_block do |*args|
-            puts 'in finished callback'
-            # binding.pry
-            # ensure this block is called
-            puts 'SANITY CHECK'
-            # test_file_hash.should be.equal(expected_hash)
-            puts '!SANITY CHECK'
-            puts 'end of test'
-          end
-          puts 'done'
-        # end
-        puts 'more done'
-      end
-    end
-  end
-
-  describe '#store_file' do
-    let(:test_bucket_name) {'test'}
-    let(:test_file_name) {'test.data'}
-    let(:test_file_path) {File.join %W(#{__dir__} .. helpers upload.data)}
-    let(:options) {{
-        file_name: test_file_name
-    }}
-    let(:progress_block) {Proc.new do
-      # binding.pry
-      # ensure this block is called
-    end}
-
-
-    context 'without error' do
-      it 'uploads a file of the same size to the the specified bucket' do
-        get_test_bucket_id do |test_bucket_id|
-          instance.store_file test_bucket_id,
-                              test_file_path,
-                              options,
-                              progress_block do |*args|
-            # binding.pry
-            # ensure this block is called
-          end
-        end
-      end
-    end
-  end
 end
