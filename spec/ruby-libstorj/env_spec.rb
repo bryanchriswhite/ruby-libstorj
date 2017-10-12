@@ -1,3 +1,4 @@
+require 'openssl'
 require_relative '../helpers/storj_options'
 include LibStorjTest
 
@@ -7,6 +8,16 @@ RSpec.describe LibStorj::Env do
       test_bucket = buckets.find {|bucket| bucket.name == test_bucket_name}
       throw(:no_bucket) unless test_bucket
       block.call test_bucket.id
+    end
+  end
+
+  def get_test_file_id(&block)
+    get_test_bucket_id do |test_bucket_id|
+      instance.list_files test_bucket_id do |error, files|
+        test_file = files.find {|file| file.name == test_file_name}
+        throw(:no_file) unless test_file
+        block.call test_file.id, test_bucket_id
+      end
     end
   end
 
@@ -244,7 +255,81 @@ RSpec.describe LibStorj::Env do
     end
   end
 
+  describe '#store_file' do
+    let(:test_bucket_name) {'test'}
+    let(:test_file_name) {'test.data'}
+    let(:test_file_path) {File.join %W(#{__dir__} .. helpers upload.data)}
+    let(:options) {{
+        file_name: test_file_name
+    }}
+    let(:progress_block) {Proc.new do
+      # ensure this block is called
+    end}
+
+    before do
+      done = nil
+      instance.create_bucket test_bucket_name do
+        done = true
+      end
+
+      wait_for(done).to be_truthy
+    end
+
+    context 'without error' do
+      it 'uploads a file of the same size to the the specified bucket' do
+        get_test_bucket_id do |test_bucket_id|
+          instance.store_file test_bucket_id,
+                              test_file_path,
+                              options,
+                              progress_block do |file_id|
+            if file_id.nil?
+              fail %q(Please ensure the test file doesn't already exist; TODO: automate this)
+            end
+
+            expect(file_id).to match(/\w+/i)
+            # ensure this block is called
+          end
+        end
+      end
+    end
+  end
+
+  describe '#resolve_file' do
+    let(:test_bucket_name) {'test'}
+    let(:test_file_name) {'test.data'}
+    let(:test_file_path) {File.join %W(#{__dir__} .. helpers download.data)}
+    let(:expected_hash) {File.read test_file_path}
+    let(:test_file_hash) {
+      data = File.read test_file_path
+      OpenSSL::Digest::SHA256.hexdigest data
+    }
+    let(:progress_block) {Proc.new do
+      # ensure this block gets called
+    end}
+
+    after :each do
+      if File.exists? test_file_path
+        File.unlink test_file_path
+      end
+    end
+
+    context 'without error' do
+      it 'downloads a file with the same sha256sum as the uploaded test data' do
+        get_test_file_id do |test_bucket_id, test_file_id|
+          instance.resolve_file test_bucket_id,
+                                test_file_id,
+                                test_file_path,
+                                progress_block do |*args|
+            # ensure this block is called
+            expect(expected_hash).to equal(test_file_hash)
+          end
+        end
+      end
+    end
+  end
+
   describe '#list_files' do
+    puts 'NB: `#list_files` test requires files be added to the `test` bucket; TODO: automate this'
     # let(:test_bucket_name) {'bucket_with_files1'}
     let(:test_bucket_name) {'test'}
 
@@ -260,8 +345,6 @@ RSpec.describe LibStorj::Env do
       it 'yields with a nil error and an array of files' do
         get_test_bucket_id do |test_bucket_id|
           instance.list_files(test_bucket_id) do |error, files|
-            puts "error: #{error}"
-            puts "files: #{files}"
             expect(error).to be(nil)
             expect(files).to be_an_instance_of(Array)
             expect(files).to satisfy do |files|
@@ -295,4 +378,5 @@ RSpec.describe LibStorj::Env do
       end
     end
   end
+
 end

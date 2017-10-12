@@ -14,6 +14,12 @@ module LibStorjTest
       options.each do |option|
         name, value = [option[0].to_sym, option[1]]
 
+        if name == :logger
+          option_instance[:logger] = ::LibStorj::Ext::Storj.const_get value
+
+          next
+        end
+
         option_field = member_field_hash[name]
 
         # TODO: check types and/or error handle

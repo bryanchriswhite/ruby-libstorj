@@ -1,5 +1,13 @@
 module LibStorj
   module Ext
+    module LibC
+      extend FFI::Library
+      ffi_lib('c')
+
+      attach_function('fopen', [:string, :string], :pointer)
+      attach_function('raise', [:int], :int)
+    end
+
     module Curl
       extend FFI::Library
       ffi_lib('curl')
@@ -25,6 +33,12 @@ module LibStorj
     module Storj
       extend FFI::Library
       ffi_lib('storj')
+
+      JSON_LOGGER = FFI::Function.new :void, [:string, :int, :pointer] do |message, level, handle|
+        puts JSON.dump message: message,
+                       level: level,
+                       timestamp: ::LibStorj.util_timestamp
+      end
 
       attach_function('mnemonic_generate', 'storj_mnemonic_generate', [:int, :pointer], :int)
 
