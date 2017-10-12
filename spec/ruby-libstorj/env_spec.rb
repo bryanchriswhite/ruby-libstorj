@@ -255,49 +255,6 @@ RSpec.describe LibStorj::Env do
     end
   end
 
-  xdescribe '#resolve_file' do
-    let(:test_bucket_name) {'test'}
-    let(:test_file_name) {'test.data'}
-    let(:test_file_path) {'/home/user/Projects/ruby-libstorj/spec/helpers/download.data'} #{File.join %W(#{__dir__} .. helpers download.data)}
-    let(:expected_hash) {File.read test_file_path}
-    let(:test_file_hash) {
-      data = File.read test_file_path
-      OpenSSL::Digest::SHA256.hexdigest data
-    }
-    let(:progress_block) {Proc.new do
-      # binding.pry
-      puts 'hello from progress_block'
-    end}
-
-    after :each do
-      if File.exists? test_file_path
-        File.unlink test_file_path
-      end
-    end
-
-    context 'without error' do
-      it 'downloads a file with the same sha256sum as the uploaded test data' do
-        puts 'doing it'
-        get_test_file_id do |test_bucket_id, test_file_id|
-          instance.resolve_file test_bucket_id,
-                                test_file_id,
-                                test_file_path,
-                                progress_block do |*args|
-            puts 'in finished callback'
-            # binding.pry
-            # ensure this block is called
-            puts 'SANITY CHECK'
-            # test_file_hash.should be.equal(expected_hash)
-            puts '!SANITY CHECK'
-            puts 'end of test'
-          end
-          puts 'done'
-        end
-        puts 'more done'
-      end
-    end
-  end
-
   describe '#store_file' do
     let(:test_bucket_name) {'test'}
     let(:test_file_name) {'test.data'}
@@ -331,6 +288,40 @@ RSpec.describe LibStorj::Env do
 
             expect(file_id).to match(/\w+/i)
             # ensure this block is called
+          end
+        end
+      end
+    end
+  end
+
+  describe '#resolve_file' do
+    let(:test_bucket_name) {'test'}
+    let(:test_file_name) {'test.data'}
+    let(:test_file_path) {File.join %W(#{__dir__} .. helpers download.data)}
+    let(:expected_hash) {File.read test_file_path}
+    let(:test_file_hash) {
+      data = File.read test_file_path
+      OpenSSL::Digest::SHA256.hexdigest data
+    }
+    let(:progress_block) {Proc.new do
+      # ensure this block gets called
+    end}
+
+    after :each do
+      if File.exists? test_file_path
+        File.unlink test_file_path
+      end
+    end
+
+    context 'without error' do
+      it 'downloads a file with the same sha256sum as the uploaded test data' do
+        get_test_file_id do |test_bucket_id, test_file_id|
+          instance.resolve_file test_bucket_id,
+                                test_file_id,
+                                test_file_path,
+                                progress_block do |*args|
+            # ensure this block is called
+            expect(expected_hash).to equal(test_file_hash)
           end
         end
       end

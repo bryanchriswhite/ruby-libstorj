@@ -105,19 +105,11 @@ module LibStorj
                :handle, :pointer,
                :shard, :pointer, # shard_tracker_t
                :pending_work_count, :int,
+               #NB: workaround; `libstorj` segfaults without this when calling `storj_bridge_store_file`
                :fake_member, :pointer
       end
 
       class DownloadState < FFI::Struct
-        def log
-          members.each do |member|
-            value = self[member]
-            puts "download state address: #{self.to_ptr.address.to_s(16)}"
-            next puts "#{member}: #{value}" unless value.is_a?(FFI::Pointer)
-            next puts "#{member} address: #{value.address.to_s(16)}" if value.respond_to? :address
-            puts "#{member} pointer address: #{value.address.to_s(16)}"
-          end
-        end
         layout :total_bytes, :uint64,
                :requesting_info, :bool,
                :info_fail_count, :uint32,
@@ -151,7 +143,9 @@ module LibStorj
                :hmac, :string,
                :pending_work_count, :uint32,
                :log, :pointer, # storj_log_levels_t
-               :handle, :pointer
+               :handle, :pointer,
+               #NB: workaround; `libstorj` segfaults without this when calling `storj_bridge_resolve_file`
+               :fake_member, :pointer
       end
 
       class EncryptOptions < FFI::Struct

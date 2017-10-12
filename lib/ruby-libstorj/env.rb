@@ -81,21 +81,15 @@ module LibStorj
 
     def resolve_file(bucket_id, file_id, file_path, progress_proc = nil)
       download_state = ::LibStorj::Ext::Storj::DownloadState.new
-      file_descriptor = ::LibStorj::Ext::LibC.fopen(file_path, 'w')
+      file_descriptor = ::LibStorj::Ext::LibC.fopen(file_path, 'w+')
 
       progress_cb = FFI::Function.new :void, %i[double uint64 uint64 pointer] do
       |progress, downloaded_bytes, total_bytes, handle|
-        puts
-        puts 'progress log'
-        download_state.log
         progress_proc.call progress, downloaded_bytes, total_bytes if progress_proc
       end
 
       finished_cb = FFI::Function.new :void, %i[int pointer pointer] do |status, file_id, handle|
         # do error handling based on status
-        puts
-        puts 'finished log'
-        download_state.log
         yield file_id if block_given?
       end
 
@@ -104,10 +98,6 @@ module LibStorj
       end
 
       uv_queue_and_run do
-        puts
-        puts 'pre log'
-        download_state.log
-        ::LibStorj::Ext::LibC.raise(10)
         ::LibStorj::Ext::Storj::File.resolve @storj_env,
                                              download_state,
                                              bucket_id,
