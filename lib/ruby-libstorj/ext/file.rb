@@ -49,12 +49,20 @@ module LibStorj
 
         private :_all
 
+        attach_function('delete', 'storj_bridge_delete_file', [
+            Env.by_ref,
+            :string,
+            :string,
+            ::LibStorj::Ext::Storj::JsonRequest::CALLBACK,
+            :pointer, # after_work_cb
+        ], :int)
+
         attach_function('resolve', 'storj_bridge_resolve_file', [
             Env.by_ref,
             ::LibStorj::Ext::Storj::DownloadState.by_ref,
             :string,
             :string,
-            :pointer, # fd
+            :pointer, # FILE* destination
             :pointer, # handle
             PROGRESS_CALLBACK, # progress_cb
             FINISHED_DOWNLOAD_CALLBACK, # finished_cb

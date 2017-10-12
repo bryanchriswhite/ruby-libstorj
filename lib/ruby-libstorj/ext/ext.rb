@@ -40,6 +40,8 @@ module LibStorj
                        timestamp: ::LibStorj.util_timestamp
       end
 
+      attach_function('util_timestamp', 'storj_util_timestamp', [], :uint64)
+      attach_function('mnemonic_check', 'storj_mnemonic_check', [:string], :bool)
       attach_function('mnemonic_generate', 'storj_mnemonic_generate', [:int, :pointer], :int)
 
       attach_function('get_info', 'storj_bridge_get_info', [

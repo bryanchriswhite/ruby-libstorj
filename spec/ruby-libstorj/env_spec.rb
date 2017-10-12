@@ -3,24 +3,6 @@ require_relative '../helpers/storj_options'
 include LibStorjTest
 
 RSpec.describe LibStorj::Env do
-  def get_test_bucket_id(&block)
-    instance.get_buckets do |error, buckets|
-      test_bucket = buckets.find {|bucket| bucket.name == test_bucket_name}
-      throw(:no_bucket) unless test_bucket
-      block.call test_bucket.id
-    end
-  end
-
-  def get_test_file_id(&block)
-    get_test_bucket_id do |test_bucket_id|
-      instance.list_files test_bucket_id do |error, files|
-        test_file = files.find {|file| file.name == test_file_name}
-        throw(:no_file) unless test_file
-        block.call test_file.id, test_bucket_id
-      end
-    end
-  end
-
   let(:bucket_class) {::LibStorj::Ext::Storj::Bucket}
   let(:file_class) {::LibStorj::Ext::Storj::File}
   let(:instance) do
@@ -153,7 +135,7 @@ RSpec.describe LibStorj::Env do
   end
 
   describe '#create_bucket' do
-    let(:test_bucket_name) {'__ruby-libstorj_test'}
+    let(:test_bucket_name) {'test'}
 
     # TODO: refactor error contexts into shared example group 'api request'
     context 'without error' do
@@ -212,7 +194,7 @@ RSpec.describe LibStorj::Env do
   end
 
   describe '#delete_bucket' do
-    let(:test_bucket_name) {'__ruby-libstorj_test'}
+    let(:test_bucket_name) {'test'}
 
     before :each do
       instance.create_bucket(test_bucket_name)
@@ -294,7 +276,7 @@ RSpec.describe LibStorj::Env do
     end
   end
 
-  describe '#resolve_file' do
+  xdescribe '#resolve_file' do
     let(:test_bucket_name) {'test'}
     let(:test_file_name) {'test.data'}
     let(:test_file_path) {File.join %W(#{__dir__} .. helpers download.data)}
@@ -329,19 +311,11 @@ RSpec.describe LibStorj::Env do
   end
 
   describe '#list_files' do
-    puts 'NB: `#list_files` test requires files be added to the `test` bucket; TODO: automate this'
-    # let(:test_bucket_name) {'bucket_with_files1'}
+    #NB: `#list_files` test requires files be added to the `test` bucket;
+    #TODO: automate this'
     let(:test_bucket_name) {'test'}
 
     context 'without error' do
-      # before do
-      #   instance.create_bucket test_bucket_name
-      # end
-      #
-      # after do
-      #   instance.delete_bucket test_bucket_name
-      # end
-
       it 'yields with a nil error and an array of files' do
         get_test_bucket_id do |test_bucket_id|
           instance.list_files(test_bucket_id) do |error, files|
@@ -379,4 +353,36 @@ RSpec.describe LibStorj::Env do
     end
   end
 
+  describe '#delete_file' do
+    let(:test_bucket_name) {'test'}
+    let(:test_file_name) {'test.data'}
+    let(:test_file_path) {File.join %W(#{__dir__} .. helpers upload.data)}
+
+    context 'without error' do
+      it 'yields with nil error and the new bucket' do
+        get_test_file_id do |test_file_id, test_bucket_id|
+          instance.delete_file test_bucket_id, test_file_id do |error|
+            expect(error).to be_nil
+            instance.list_files test_bucket_id do |error, files|
+              file_was_deleted = files.nil? || files.any {|file| file.name == test_file_name}
+              expect(file_was_deleted).to be_truthy
+            end
+          end
+        end
+      end
+    end
+
+    context 'with error' do
+      describe 'external error' do
+        it 'yields with a non-nil error value and nil response' do
+          # (see https://tools.ietf.org/html/rfc2606)
+          instance.storj_env[:bridge_options][:host].write_string 'a.nonexistant.example'
+
+          expect do |block|
+            instance.create_bucket(test_bucket_name, &block)
+          end.to yield_with_args(/couldn't resolve host name/i, nil)
+        end
+      end
+    end
+  end
 end

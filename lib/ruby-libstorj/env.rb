@@ -29,8 +29,9 @@ module LibStorj
     end
 
     def delete_bucket(bucket_id, &block)
-      after_work_cb = ::LibStorj::Ext::Storj::JsonRequest.after_work_cb
-      ruby_handle = ::LibStorj::Ext::Storj::JsonRequest.ruby_handle do |error|
+      req_data_type = ::LibStorj::Ext::Storj::JsonRequest
+      after_work_cb = req_data_type.after_work_cb
+      ruby_handle = req_data_type.ruby_handle do |error|
         yield error if block_given?
       end
 
@@ -43,8 +44,9 @@ module LibStorj
     end
 
     def get_buckets(&block)
-      after_work_cb = ::LibStorj::Ext::Storj::GetBucketRequest.after_work_cb
-      ruby_handle = ::LibStorj::Ext::Storj::GetBucketRequest.ruby_handle(&block)
+      req_data_type = ::LibStorj::Ext::Storj::GetBucketRequest
+      after_work_cb = req_data_type.after_work_cb
+      ruby_handle = req_data_type.ruby_handle(&block)
 
       uv_queue_and_run do
         ::LibStorj::Ext::Storj::Bucket.all @storj_env,
@@ -76,6 +78,20 @@ module LibStorj
                                          bucket_id,
                                          ruby_handle,
                                          after_work_cb
+      end
+    end
+
+    def delete_file(bucket_id, file_id, &block)
+      req_data_type = ::LibStorj::Ext::Storj::JsonRequest
+      after_work_cb = req_data_type.after_work_cb
+      ruby_handle = req_data_type.ruby_handle(&block)
+
+      uv_queue_and_run do
+        ::LibStorj::Ext::Storj::File.delete @storj_env,
+                                            bucket_id,
+                                            file_id,
+                                            ruby_handle,
+                                            after_work_cb
       end
     end
 
