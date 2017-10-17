@@ -112,8 +112,9 @@ module LibStorj
       ruby_handle = FFI::Function.new :void, [] do
       end
 
+      download_state = nil
       uv_queue_and_run do
-        ::LibStorj::Ext::Storj::File.resolve @storj_env,
+        download_state = ::LibStorj::Ext::Storj::File.resolve @storj_env,
                                              bucket_id,
                                              file_id,
                                              file_descriptor,
@@ -121,6 +122,8 @@ module LibStorj
                                              progress_cb,
                                              finished_cb
       end
+
+      return download_state
     end
 
     def store_file(bucket_id, file_path, progress_proc = nil, options = {})
@@ -145,13 +148,16 @@ module LibStorj
         yield file_id if block_given?
       end
 
+      upload_state = nil
       uv_queue_and_run do
-        ::LibStorj::Ext::Storj::File.store @storj_env,
+        upload_state = ::LibStorj::Ext::Storj::File.store @storj_env,
                                            upload_options,
                                            FFI::MemoryPointer::NULL,
                                            progress_cb,
                                            finished_cb
       end
+
+      return upload_state
     end
 
     def uv_queue_and_run

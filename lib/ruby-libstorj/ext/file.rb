@@ -25,10 +25,6 @@ module LibStorj
           @name, @id, @size = self.values_at %i[filename id size]
         end
 
-        def self.all(*args)
-          _all(*args)
-        end
-
         def self.pointer_to_array(pointer, array_length)
           if pointer.nil? || pointer == FFI::MemoryPointer::NULL || array_length < 1
             return nil
@@ -40,7 +36,7 @@ module LibStorj
           end
         end
 
-        attach_function('_all', 'storj_bridge_list_files', [
+        attach_function('all', 'storj_bridge_list_files', [
             Env.by_ref,
             :string,
             ::LibStorj::Ext::Storj::JsonRequest::CALLBACK,
@@ -65,7 +61,7 @@ module LibStorj
             :pointer, # handle
             PROGRESS_CALLBACK, # progress_cb
             FINISHED_DOWNLOAD_CALLBACK, # finished_cb
-        ], :int)
+        ], ::LibStorj::Ext::Storj::DownloadState.by_ref)
 
         attach_function('store', 'storj_bridge_store_file', [
             Env.by_ref,
@@ -73,7 +69,7 @@ module LibStorj
             :pointer, # handle
             PROGRESS_CALLBACK, # progress_cb
             FINISHED_DOWNLOAD_CALLBACK, # finished_cb
-        ], :int)
+        ], ::LibStorj::Ext::Storj::UploadState.by_ref)
       end
     end
   end
