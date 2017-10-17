@@ -59,7 +59,6 @@ module LibStorj
 
         attach_function('resolve', 'storj_bridge_resolve_file', [
             Env.by_ref,
-            ::LibStorj::Ext::Storj::DownloadState.by_ref,
             :string,
             :string,
             :pointer, # FILE* destination
@@ -70,7 +69,6 @@ module LibStorj
 
         attach_function('store', 'storj_bridge_store_file', [
             Env.by_ref,
-            ::LibStorj::Ext::Storj::UploadState.by_ref,
             ::LibStorj::Ext::Storj::UploadOptions.by_ref,
             :pointer, # handle
             PROGRESS_CALLBACK, # progress_cb

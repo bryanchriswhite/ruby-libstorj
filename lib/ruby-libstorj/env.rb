@@ -96,7 +96,6 @@ module LibStorj
     end
 
     def resolve_file(bucket_id, file_id, file_path, progress_proc = nil)
-      download_state = ::LibStorj::Ext::Storj::DownloadState.new
       file_descriptor = ::LibStorj::Ext::LibC.fopen(file_path, 'w+')
 
       progress_cb = FFI::Function.new :void, %i[double uint64 uint64 pointer] do
@@ -115,7 +114,6 @@ module LibStorj
 
       uv_queue_and_run do
         ::LibStorj::Ext::Storj::File.resolve @storj_env,
-                                             download_state,
                                              bucket_id,
                                              file_id,
                                              file_descriptor,
@@ -133,7 +131,6 @@ module LibStorj
       }
       options = options.merge(default_options) {|key, oldval| oldval}
 
-      upload_state = ::LibStorj::Ext::Storj::UploadState.new
       upload_options =
           ::LibStorj::Ext::Storj::UploadOptions.new options
 
@@ -149,9 +146,7 @@ module LibStorj
       end
 
       uv_queue_and_run do
-        # upload_state[:env] = @storj_env
         ::LibStorj::Ext::Storj::File.store @storj_env,
-                                           upload_state,
                                            upload_options,
                                            FFI::MemoryPointer::NULL,
                                            progress_cb,
