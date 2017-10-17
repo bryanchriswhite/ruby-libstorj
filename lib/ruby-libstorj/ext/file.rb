@@ -43,7 +43,7 @@ module LibStorj
             :pointer # uv_after_work_cb*
         ], :int)
 
-        private :_all
+        private :all
 
         attach_function('delete', 'storj_bridge_delete_file', [
             Env.by_ref,
