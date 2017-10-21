@@ -4,18 +4,7 @@ ruby-libstorj: Ruby bindings for libstorj
 ## Using ruby-libstorj
 
 ### Install gem:
-+ in `Gemfile`:
-    ```ruby
-    gem 'ruby-libstorj'
-    ```
-    
-    followed by a `bundle install` (of course)
-    
-+ with `gem`:
-    ```bash
-      gem install ruby-libstorj
-    ```
-    
+_(until initial release installing from source is necessary)_
 + from source:
     ```bash
     git clone https://github.com/storj/ruby-libstorj && \
