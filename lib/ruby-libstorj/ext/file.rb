@@ -70,6 +70,14 @@ module LibStorj
             PROGRESS_CALLBACK, # progress_cb
             FINISHED_DOWNLOAD_CALLBACK, # finished_cb
         ], ::LibStorj::Ext::Storj::UploadState.by_ref)
+
+        attach_function('store_cancel', 'storj_bridge_store_file_cancel', [
+            ::LibStorj::Ext::Storj::UploadState.by_ref
+        ], :int)
+
+        attach_function('resolve_cancel', 'storj_bridge_resolve_file_cancel', [
+            ::LibStorj::Ext::Storj::DownloadState.by_ref
+        ], :int)
       end
     end
   end

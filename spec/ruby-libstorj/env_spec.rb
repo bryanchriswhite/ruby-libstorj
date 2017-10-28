@@ -73,10 +73,14 @@ RSpec.describe LibStorj::Env do
   describe '#get_info' do
     context 'without error' do
       it 'yields with an nil error and hash response' do
+        yielded = false
         instance.get_info do |error, info|
           expect(error).to be(nil)
           expect(info).to be_an_instance_of(Hash)
+          yielded = true
         end
+
+        wait_for(yielded).to be_truthy
       end
     end
 
@@ -244,7 +248,7 @@ RSpec.describe LibStorj::Env do
     let(:options) {{
         file_name: test_file_name
     }}
-    let(:progress_block) {Proc.new do
+    let(:progress_proc) {Proc.new do
       # ensure this block is called
     end}
 
@@ -260,10 +264,12 @@ RSpec.describe LibStorj::Env do
     context 'without error' do
       it 'uploads a file of the same size to the the specified bucket' do
         get_test_bucket_id do |test_bucket_id|
-          instance.store_file test_bucket_id,
-                              test_file_path,
-                              options,
-                              progress_block do |file_id|
+          require 'pry'
+          binding.pry
+          state = instance.store_file bucket_id: test_bucket_id,
+                              file_path: test_file_path,
+                              options: options,
+                              progress_proc: progress_proc do |file_id|
             if file_id.nil?
               fail %q(Please ensure the test file doesn't already exist; TODO: automate this)
             end
@@ -285,7 +291,7 @@ RSpec.describe LibStorj::Env do
       data = File.read test_file_path
       OpenSSL::Digest::SHA256.hexdigest data
     }
-    let(:progress_block) {Proc.new do
+    let(:progress_proc) {Proc.new do
       # ensure this block gets called
     end}
 
@@ -298,10 +304,10 @@ RSpec.describe LibStorj::Env do
     context 'without error' do
       it 'downloads a file with the same sha256sum as the uploaded test data' do
         get_test_file_id do |test_bucket_id, test_file_id|
-          instance.resolve_file test_bucket_id,
-                                test_file_id,
-                                test_file_path,
-                                progress_block do |*args|
+          instance.resolve_file bucket_id: test_bucket_id,
+                                file_id: test_file_id,
+                                file_path: test_file_path,
+                                progress_proc: progress_proc do |*args|
             # ensure this block is called
             expect(expected_hash).to equal(test_file_hash)
           end

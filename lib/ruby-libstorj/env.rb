@@ -21,11 +21,11 @@ module LibStorj
         yield error if block_given?
       end
 
-      uv_queue_and_run do
-        ::LibStorj::Ext::Storj.get_info @storj_env,
-                                        ruby_handle,
-                                        after_work_cb
-      end
+      status = ::LibStorj::Ext::Storj.get_info @storj_env,
+                                      ruby_handle,
+                                      after_work_cb
+      reactor.run
+      status
     end
 
     def delete_bucket(bucket_id, &block)
@@ -35,12 +35,12 @@ module LibStorj
         yield error if block_given?
       end
 
-      uv_queue_and_run do
-        ::LibStorj::Ext::Storj::Bucket.delete @storj_env,
+      status = ::LibStorj::Ext::Storj::Bucket.delete @storj_env,
                                               bucket_id,
                                               ruby_handle,
                                               after_work_cb
-      end
+      reactor.run
+      status
     end
 
     def get_buckets(&block)
@@ -48,11 +48,11 @@ module LibStorj
       after_work_cb = req_data_type.after_work_cb
       ruby_handle = req_data_type.ruby_handle(&block)
 
-      uv_queue_and_run do
-        ::LibStorj::Ext::Storj::Bucket.all @storj_env,
+      status = ::LibStorj::Ext::Storj::Bucket.all @storj_env,
                                            ruby_handle,
                                            after_work_cb
-      end
+      reactor.run
+      status
     end
 
     def create_bucket(name, &block)
@@ -60,12 +60,12 @@ module LibStorj
       after_work_cb = req_data_type.after_work_cb
       ruby_handle = req_data_type.ruby_handle(&block)
 
-      uv_queue_and_run do
-        ::LibStorj::Ext::Storj::Bucket.create @storj_env,
+      status = ::LibStorj::Ext::Storj::Bucket.create @storj_env,
                                               name,
                                               ruby_handle,
                                               after_work_cb
-      end
+      reactor.run
+      status
     end
 
     def list_files(bucket_id, &block)
@@ -73,12 +73,12 @@ module LibStorj
       after_work_cb = req_data_type.after_work_cb
       ruby_handle = req_data_type.ruby_handle(&block)
 
-      uv_queue_and_run do
-        ::LibStorj::Ext::Storj::File.all @storj_env,
+      status = ::LibStorj::Ext::Storj::File.all @storj_env,
                                          bucket_id,
                                          ruby_handle,
                                          after_work_cb
-      end
+      reactor.run
+      status
     end
 
     def delete_file(bucket_id, file_id, &block)
@@ -86,54 +86,61 @@ module LibStorj
       after_work_cb = req_data_type.after_work_cb
       ruby_handle = req_data_type.ruby_handle(&block)
 
-      uv_queue_and_run do
-        ::LibStorj::Ext::Storj::File.delete @storj_env,
+      status = ::LibStorj::Ext::Storj::File.delete @storj_env,
                                             bucket_id,
                                             file_id,
                                             ruby_handle,
                                             after_work_cb
-      end
+      reactor.run
+      status
     end
 
-    def resolve_file(bucket_id, file_id, file_path, progress_proc = nil)
+    def resolve_file(bucket_id:,
+                     file_id:,
+                     file_path:,
+                     progress_proc: nil,
+                     finished_proc: nil,
+                     &block)
       file_descriptor = ::LibStorj::Ext::LibC.fopen(file_path, 'w+')
-
       progress_cb = FFI::Function.new :void, %i[double uint64 uint64 pointer] do
       |progress, downloaded_bytes, total_bytes, handle|
         progress_proc.call progress, downloaded_bytes, total_bytes if progress_proc
       end
 
+      # TODO: decide precedence
+      finished_proc = finished_proc || block
       finished_cb = FFI::Function.new :void, %i[int pointer pointer] do |status, file_id, handle|
         # do error handling based on status
-        yield file_id if block_given?
+        finished_proc.call file_id
       end
 
       # ruby_handle = FFI::MemoryPointer::NULL
       ruby_handle = FFI::Function.new :void, [] do
       end
 
-      download_state = nil
-      uv_queue_and_run do
-        download_state = ::LibStorj::Ext::Storj::File.resolve @storj_env,
-                                             bucket_id,
-                                             file_id,
-                                             file_descriptor,
-                                             ruby_handle,
-                                             progress_cb,
-                                             finished_cb
-      end
-
-      return download_state
+      state = ::LibStorj::Ext::Storj::File.resolve @storj_env,
+                                                            bucket_id,
+                                                            file_id,
+                                                            file_descriptor,
+                                                            ruby_handle,
+                                                            progress_cb,
+                                                            finished_cb
+      reactor # calls uv_run.run
+      state
     end
 
-    def store_file(bucket_id, file_path, progress_proc = nil, options = {})
-      options = progress_proc if progress_proc.is_a? Hash
+    def store_file(bucket_id:,
+                   file_path:,
+                   progress_proc: nil,
+                   finished_proc: nil,
+                   options: {},
+                   &block)
       default_options = {
           bucket_id: bucket_id,
           file_path: file_path,
       }
-      options = options.merge(default_options) {|key, oldval| oldval}
 
+      options = options.merge(default_options) {|key, oldval| oldval}
       upload_options =
           ::LibStorj::Ext::Storj::UploadOptions.new options
 
@@ -142,35 +149,22 @@ module LibStorj
         progress_proc.call progress, bytes, total_bytes if progress_proc
       end
 
+      #TODO: decide precedence
+      finished_proc = finished_proc || block
       finished_cb = FFI::Function.new :void, %i[int string pointer] do
       |status, file_id, handle|
         # do error handling based on status
-        yield file_id if block_given?
+        finished_proc.call file_id
       end
 
-      upload_state = nil
-      uv_queue_and_run do
-        upload_state = ::LibStorj::Ext::Storj::File.store @storj_env,
-                                           upload_options,
-                                           FFI::MemoryPointer::NULL,
-                                           progress_cb,
-                                           finished_cb
-      end
-
-      return upload_state
+      # calls uv_queue_work
+      state = ::LibStorj::Ext::Storj::File.store @storj_env,
+                                                 upload_options,
+                                                 FFI::MemoryPointer::NULL,
+                                                 progress_cb,
+                                                 finished_cb
+      reactor #calls uv_run.run
+      state
     end
-
-    def uv_queue_and_run
-      reactor do |reactor|
-        @chain = reactor.work do
-          yield
-        end.catch do |error|
-          raise error
-        end
-      end
-      @chain
-    end
-
-    private :uv_queue_and_run
   end
 end

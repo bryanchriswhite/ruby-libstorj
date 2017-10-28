@@ -107,6 +107,10 @@ module LibStorj
                :pending_work_count, :int,
                #NB: workaround; `libstorj` segfaults without this when calling `storj_bridge_store_file`
                :fake_member, :pointer
+
+        def cancel
+          ::LibStorj::Ext::Storj::File.store_cancel self
+        end
       end
 
       class DownloadState < FFI::Struct
@@ -146,6 +150,10 @@ module LibStorj
                :handle, :pointer,
                #NB: workaround; `libstorj` segfaults without this when calling `storj_bridge_resolve_file`
                :fake_member, :pointer
+
+        def cancel
+          ::LibStorj::Ext::Storj::File.resolve_cancel self
+        end
       end
 
       class EncryptOptions < FFI::Struct
