@@ -15,45 +15,6 @@ RSpec.describe LibStorj::Env do
     instance.destroy
   end
 
-  describe '.uv_queue_and_run' do
-    # expose otherwise private `LibStorj::Env#uv_queue_and_run`
-    before :all do
-      module LibStorj
-        class Env
-          def uv_queue_and_run_test_proxy(*args, &block)
-            uv_queue_and_run(*args, &block)
-          end
-        end
-      end
-    end
-
-    context 'without error' do
-      it 'yields the block asynchronously' do
-        expect do |block|
-          instance.uv_queue_and_run_test_proxy(&block)
-        end.to yield_control
-      end
-
-      it 'returns a promise' do
-        expect(instance.uv_queue_and_run_test_proxy do
-          #-- noop
-        end).to respond_to(:then, :catch)
-      end
-    end
-
-    context 'catching an async error' do
-      let(:test_error) {Exception.new 'test exception'}
-
-      it 'raises an `ArgumentError`' do
-        expect do
-          instance.uv_queue_and_run_test_proxy do
-            raise(test_error)
-          end
-        end.to raise_error(test_error)
-      end
-    end
-  end
-
   describe 'new' do
     it 'returns an instance of the described class' do
       expect(instance).to be_an_instance_of(described_class)
@@ -152,7 +113,7 @@ RSpec.describe LibStorj::Env do
           end
         end
 
-        yield
+        yield if block_given?
       end
 
       after do
@@ -264,8 +225,6 @@ RSpec.describe LibStorj::Env do
     context 'without error' do
       it 'uploads a file of the same size to the the specified bucket' do
         get_test_bucket_id do |test_bucket_id|
-          require 'pry'
-          binding.pry
           state = instance.store_file bucket_id: test_bucket_id,
                               file_path: test_file_path,
                               options: options,
@@ -282,7 +241,7 @@ RSpec.describe LibStorj::Env do
     end
   end
 
-  xdescribe '#resolve_file' do
+  describe '#resolve_file' do
     let(:test_bucket_name) {'test'}
     let(:test_file_name) {'test.data'}
     let(:test_file_path) {File.join %W(#{__dir__} .. helpers download.data)}

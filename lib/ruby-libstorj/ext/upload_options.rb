@@ -11,8 +11,10 @@ module LibStorj
                :file_name, :pointer, # char*
                :fd, :pointer # FILE*
 
-        def initialize(options)
-          bucket_id, file_path, file_name, index = options.values_at *(%i[bucket_id file_path file_name index])
+        def initialize(bucket_id:,
+                       file_path:,
+                       file_name: nil,
+                       index: nil)
           if file_path.nil? || !::File.exists?(file_path)
             raise Errno::ENOENT.new(file_path || 'nil')
           end

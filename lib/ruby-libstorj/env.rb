@@ -8,6 +8,7 @@ module LibStorj
 
     def initialize(*options)
       @storj_env = ::LibStorj::Ext::Storj.method(:init_env).call(*options)
+      # use ruby libuv's default_loop
       @storj_env[:loop] = ::Libuv::Ext.default_loop
     end
 
@@ -21,10 +22,11 @@ module LibStorj
         yield error if block_given?
       end
 
+      # calls uv_queue_work
       status = ::LibStorj::Ext::Storj.get_info @storj_env,
                                       ruby_handle,
                                       after_work_cb
-      reactor.run
+      reactor.run # calls uv_run
       status
     end
 
@@ -35,11 +37,12 @@ module LibStorj
         yield error if block_given?
       end
 
+      # calls uv_queue_work
       status = ::LibStorj::Ext::Storj::Bucket.delete @storj_env,
                                               bucket_id,
                                               ruby_handle,
                                               after_work_cb
-      reactor.run
+      reactor.run # calls uv_run
       status
     end
 
@@ -48,10 +51,11 @@ module LibStorj
       after_work_cb = req_data_type.after_work_cb
       ruby_handle = req_data_type.ruby_handle(&block)
 
+      # calls uv_queue_work
       status = ::LibStorj::Ext::Storj::Bucket.all @storj_env,
                                            ruby_handle,
                                            after_work_cb
-      reactor.run
+      reactor.run # calls uv_run
       status
     end
 
@@ -60,11 +64,12 @@ module LibStorj
       after_work_cb = req_data_type.after_work_cb
       ruby_handle = req_data_type.ruby_handle(&block)
 
+      # calls uv_queue_work
       status = ::LibStorj::Ext::Storj::Bucket.create @storj_env,
                                               name,
                                               ruby_handle,
                                               after_work_cb
-      reactor.run
+      reactor.run # calls uv_run
       status
     end
 
@@ -77,7 +82,7 @@ module LibStorj
                                          bucket_id,
                                          ruby_handle,
                                          after_work_cb
-      reactor.run
+      reactor.run # calls uv_run
       status
     end
 
@@ -86,12 +91,13 @@ module LibStorj
       after_work_cb = req_data_type.after_work_cb
       ruby_handle = req_data_type.ruby_handle(&block)
 
+      # calls uv_queue_work
       status = ::LibStorj::Ext::Storj::File.delete @storj_env,
                                             bucket_id,
                                             file_id,
                                             ruby_handle,
                                             after_work_cb
-      reactor.run
+      reactor.run # calls uv_run
       status
     end
 
@@ -118,6 +124,7 @@ module LibStorj
       ruby_handle = FFI::Function.new :void, [] do
       end
 
+      # calls uv_queue_work
       state = ::LibStorj::Ext::Storj::File.resolve @storj_env,
                                                             bucket_id,
                                                             file_id,
@@ -125,7 +132,7 @@ module LibStorj
                                                             ruby_handle,
                                                             progress_cb,
                                                             finished_cb
-      reactor # calls uv_run.run
+      reactor.run # calls uv_run
       state
     end
 
@@ -163,7 +170,7 @@ module LibStorj
                                                  FFI::MemoryPointer::NULL,
                                                  progress_cb,
                                                  finished_cb
-      reactor #calls uv_run.run
+      reactor.run #calls uv_run
       state
     end
   end
