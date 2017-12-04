@@ -117,6 +117,7 @@ module LibStorj
       finished_proc = finished_proc || block
       finished_cb = FFI::Function.new :void, %i[int pointer pointer] do |status, file_id, handle|
         # do error handling based on status
+        ::LibStorj::Ext::LibC.fclose(file_descriptor)
         finished_proc.call file_id
       end
 

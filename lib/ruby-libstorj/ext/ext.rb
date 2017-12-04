@@ -5,6 +5,7 @@ module LibStorj
       ffi_lib('c')
 
       attach_function('fopen', [:string, :string], :pointer)
+      attach_function('fclose', [:pointer], :int)
     end
 
     module Curl
