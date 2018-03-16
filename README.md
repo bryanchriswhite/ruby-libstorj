@@ -1,5 +1,8 @@
-ruby-libstorj: Ruby bindings for libstorj
+ruby-libstorj
 ===
+[![Storj.io](https://storj.io/img/storj-badge.svg)](https://storj.io)
+
+Ruby library for encrypted file transfer on the Storj network via bindings to [libstorj](https://github.com/Storj/libstorj).
 
 ## Using ruby-libstorj
 
