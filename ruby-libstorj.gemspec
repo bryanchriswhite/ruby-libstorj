@@ -19,10 +19,11 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 2.0.0'
   gem.require_paths = ['lib']
 
-  # TODO: is this necessary?
-  # gem.add_runtime_dependency     '<gem name>', '~> <version>'
-  #
-  # gem.add_development_dependency '<gem name', '~> <version>'
+  gem.add_runtime_dependency     'ffi', '~> 1.9'
+  gem.add_runtime_dependency     'libuv', '~> 3.2'
+
+  gem.add_development_dependency 'rake', '~> 12.0'
+  gem.add_development_dependency 'rake-compiler', '~> 1.0'
 
   gem.files         = `git ls-files`.split("\n").reject {|f| f =~ /^test/}
   gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")

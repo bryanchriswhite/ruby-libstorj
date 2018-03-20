@@ -2,6 +2,8 @@ PATH
   remote: .
   specs:
     ruby-libstorj (1.0.0)
+      ffi (~> 1.9)
+      libuv (~> 3.2)
 
 GEM
   remote: https://rubygems.org/
