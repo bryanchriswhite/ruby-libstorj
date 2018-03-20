@@ -114,7 +114,7 @@ You can copy [`spec/helpers/options.yml.example`](spec/helpers/options.example.y
 cp spec/helpers/options.yml.example spec/helpers/options.yml && \
 vim spec/helpers/options.yml   # or whatever
 ```
-`spec/helpers/options.yml` should be in the [`.gitignore`](./.gitignore) so you shouldn't have to worry about accidentally committing it.
+Ensure that `spec/helpers/options.yml` is in the [`.gitignore`](./.gitignore) so you don't have to worry about accidentally committing it.
 
 #### A quick note on rspec formatters:
 The "progress" formatter is the default.
