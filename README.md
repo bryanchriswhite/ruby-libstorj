@@ -1,10 +1,22 @@
 ruby-libstorj: Ruby bindings for libstorj
 ===
+[![Gem Version](https://badge.fury.io/rb/ruby-libstorj.svg)](https://badge.fury.io/rb/ruby-libstorj)
 
 ## Using ruby-libstorj
 
 ### Install gem:
-_(until initial release installing from source is necessary)_
++ using bundler:
+    ```
+    # in your Gemfile
+    gem 'ruby-libstorj'
+    ```
+    ```bash
+    bundle install
+    ```
++ using rubygems (`gem`):
+    ```bash
+    gem install ruby-libstorj
+    ```
 + from source:
     ```bash
     git clone https://github.com/storj/ruby-libstorj && \
@@ -76,7 +88,7 @@ rake
 #### First create spec/helpers/options.yml !
 For the moment, the test suite doesn't start it's own mock backend but it does parse whatever's in the `spec/helpsers/options.yml` file to initialize `LibStorj::Ext::Storj::Env` to connect via http/https.
 
-You can copy [`spec/helpers/options.yml.example`](./spec/helpers/options.yml.example) and modify it for your use:
+You can copy [`spec/helpers/options.yml.example`](spec/helpers/options.example.yml) and modify it for your use:
 ```bash
 cp spec/helpers/options.yml.example spec/helpers/options.yml && \
 vim spec/helpers/options.yml   # or whatever

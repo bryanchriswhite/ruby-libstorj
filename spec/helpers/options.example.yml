@@ -1,12 +1,15 @@
 bridge:
   proto: https
+#  proto: http
   port: 443
+#  port: 6382
   host: api.storj.io
-  user: yourusername
-  pass: yourpassword
+#  host: 127.0.0.1
+  user: username@example.com
+  pass: password
 
 encrypt:
-  mnemonic: 'this is not really a mnemonic and i hope it does not break anything'
+  mnemonic: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
 
 http:
   user_agent: 'curl/7.52.1'
