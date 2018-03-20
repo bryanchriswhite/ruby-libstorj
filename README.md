@@ -28,7 +28,7 @@ Ruby library for encrypted file transfer on the Storj network via bindings to [l
     cd ruby-libstorj && \
     rake install
     ```
-    (see [installing for development](#wip) if you have issues with `rake install`)
+    (see [installing for development](#install-gem-1) if you have issues with `rake install`)
 
 ### Usage:
 Until more thorough documentation is available, please see the tests:
