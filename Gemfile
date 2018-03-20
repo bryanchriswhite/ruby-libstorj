@@ -2,9 +2,9 @@ source 'https://rubygems.org' do
   gem 'ffi' # Ruby FFI lib
   gem 'libuv' # libuv FFI bindings for ruby (https://github.com/cotag/libuv)
   ### libuv documentation -- http://docs.libuv.org/en/v1.x/
+  gem 'rake'
 
   group :test do
-    gem 'rake'
     gem 'rspec'
     gem 'rspec-wait'
     gem 'simplecov'
@@ -14,7 +14,6 @@ source 'https://rubygems.org' do
   group :development do
     gem 'pry' # debugging tools / REPL
     gem 'pry-byebug' # moar debugging tools
-    gem 'rake'
     gem 'rake-compiler'
     gem 'guard'
     gem 'guard-rake'

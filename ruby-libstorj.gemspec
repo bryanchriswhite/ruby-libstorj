@@ -4,7 +4,7 @@
 
 Gem::Specification.new do |gem|
   gem.name          = 'ruby-libstorj'
-  gem.version       = '1.0.0' #LibStorj::VERSION
+  gem.version       = '1.0.2' #LibStorj::VERSION
   gem.license       = 'AGPL-3.0'
   gem.authors       = ['Bryan White']
   gem.email         = ['bryanchriswhite@gmail.com', 'bryan@storj.io']
@@ -21,8 +21,8 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency     'ffi', '~> 1.9'
   gem.add_runtime_dependency     'libuv', '~> 3.2'
+  gem.add_runtime_dependency     'rake', '~> 12.0'
 
-  gem.add_development_dependency 'rake', '~> 12.0'
   gem.add_development_dependency 'rake-compiler', '~> 1.0'
 
   gem.files         = `git ls-files`.split("\n").reject {|f| f =~ /^test/}
