@@ -30,17 +30,21 @@ Ruby library for encrypted file transfer on the Storj network via bindings to [l
 
 ### Usage:
 Until more thorough documentation is available, please see the tests:
-    + [`LibStorj`](./spec/libstorj_spec.rb) _[(source)](./lib/ruby-libstorj/libstorj.rb)
-        - `LibStorj::Ext::Storj::Mixins`  _[(source)](./lib/ruby-libstorj/mixins/storj.rb)_
-    + [`LibStorj::Env`](./spec/ruby-libstorj/env_spec.rb) _[(source)](./lib/ruby-libstorj/env.rb)_
-        - `#get_info`
-        - `#get_buckets`
-        - `#create_bucket`
-        - `#delete_bucket`
-        - `#store_file`
-        - `#resolve_file`
-        - `#list_files`
-        - `#delete_file`
++ [`LibStorj`](./spec/ruby-libstorj/libstorj_spec.rb) _[(source)](./lib/ruby-libstorj/libstorj.rb)_
+    - `LibStorj::Ext::Storj::Mixins`  _[(source)](./lib/ruby-libstorj/mixins/storj.rb)_
+        - `.util_timestamp`
+        - `.util_datetime`
+        - `.mnemonic_check`
+        - `.mnemonic_generate`
++ [`LibStorj::Env`](./spec/ruby-libstorj/env_spec.rb) _[(source)](./lib/ruby-libstorj/env.rb)_
+    - `#get_info`
+    - `#get_buckets`
+    - `#create_bucket`
+    - `#delete_bucket`
+    - `#store_file`
+    - `#resolve_file`
+    - `#list_files`
+    - `#delete_file`
 
 ## Developing ruby-libstorj
 
