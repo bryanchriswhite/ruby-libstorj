@@ -79,17 +79,15 @@ rake compile
 ```
 (see [`rake-compiler`](https://github.com/rake-compiler/rake-compiler))
 
-### Build gem:
-```bash
-rake
-
-# OR
-# rake build
-# rake build[no-test]   # build without requiring tests to pass
-```
-
-### Install gem:
+### Build and install gem:
 + with `rake`:
+    ```bash
+    rake
+
+    # OR
+    # rake build
+    # rake build[no-test]   # build without requiring tests to pass
+    ```
     ```bash
     rake install
     
@@ -99,10 +97,13 @@ rake
 
 + with `gem`:
 
-    Maybe you need/want to pass args to `gem`, or maybe `rake install` doesn't work on your system:
+    Maybe you need/want to pass args to `gem`, or maybe `rake install` doesn't work in your environment:
     
     ```bash
-    gem install --local ./ruby-libstorj-*.gem  --no-ri --no-rdoc  
+    gem build ./ruby-libstorj.gemspec
+    ```
+    ```bash
+    gem install --local ./ruby-libstorj-<version>.gem  --no-ri --no-rdoc  
     ```
 
 ### Testing:
