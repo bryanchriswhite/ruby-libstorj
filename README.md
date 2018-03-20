@@ -7,6 +7,8 @@ Ruby library for encrypted file transfer on the Storj network via bindings to [l
 
 ## Using ruby-libstorj
 
+### First, install [`libstorj`](https://github.com/storj/libstorj)
+
 ### Install gem:
 + using bundler:
     ```
