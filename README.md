@@ -1,6 +1,9 @@
-ruby-libstorj: Ruby bindings for libstorj
+ruby-libstorj
 ===
+[![Storj.io](https://storj.io/img/storj-badge.svg)](https://storj.io)
 [![Gem Version](https://badge.fury.io/rb/ruby-libstorj.svg)](https://badge.fury.io/rb/ruby-libstorj)
+
+Ruby library for encrypted file transfer on the Storj network via bindings to [libstorj](https://github.com/Storj/libstorj).
 
 ## Using ruby-libstorj
 
@@ -31,7 +34,7 @@ ruby-libstorj: Ruby bindings for libstorj
 
 This project primarily uses the ruby [`ffi`](https://rubygems.org/gems/ffi) (foreign function interface) gem api to bind to C/C++ libraries and plain old ruby for logic.
 
-If the ffi api becomes insufficient the ruby gem [`rice`](https://rubygems.org/gems/rice) has proven extremely useful for doing rub things in C/C++.
+If the ffi api becomes insufficient the ruby gem [`rice`](https://rubygems.org/gems/rice) has proven extremely useful for doing ruby things in C/C++.
 Otherwise, you're going to want to read up on [ruby's C API](https://silverhammermba.github.io/emberb/c/)
 
 This project strives to conform to the ruby  and rubygems standards and conventions. See [rubygems.org guide on "Make Your Own Gem"](http://guides.rubygems.org/make-your-own-gem/) for more.
