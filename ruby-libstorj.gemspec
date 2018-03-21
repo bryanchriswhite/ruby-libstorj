@@ -4,7 +4,7 @@
 
 Gem::Specification.new do |gem|
   gem.name          = 'ruby-libstorj'
-  gem.version       = '1.0.2' #LibStorj::VERSION
+  gem.version       = '2.0.0' #LibStorj::VERSION
   gem.license       = 'AGPL-3.0'
   gem.authors       = ['Bryan White']
   gem.email         = ['bryanchriswhite@gmail.com', 'bryan@storj.io']

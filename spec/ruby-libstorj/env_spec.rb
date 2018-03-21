@@ -5,8 +5,9 @@ include LibStorjTest
 RSpec.describe LibStorj::Env do
   let(:bucket_class) {::LibStorj::Ext::Storj::Bucket}
   let(:file_class) {::LibStorj::Ext::Storj::File}
+  let(:default_path) {File.join %W(#{__dir__} .. .. options.yml)}
   let(:instance) do
-    described_class.new(*default_options)
+    described_class.new(path: default_path)
   end
 
   after :each do
@@ -69,7 +70,7 @@ RSpec.describe LibStorj::Env do
       end
 
       it 'yields a nil error and an array of buckets' do
-        expect do |block| #{|block| instance.get_bucekts(&block)}.to yield_with_args
+        expect do |block|
           instance.get_buckets do |error, buckets|
             expect(error).to be(nil)
             expect(buckets.length).to be(bucket_names.length)
@@ -241,7 +242,7 @@ RSpec.describe LibStorj::Env do
     end
   end
 
-  describe '#resolve_file' do
+  xdescribe '#resolve_file' do
     let(:test_bucket_name) {'test'}
     let(:test_file_name) {'test.data'}
     let(:test_file_path) {File.join %W(#{__dir__} .. helpers download.data)}

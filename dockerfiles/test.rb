@@ -1,8 +1,7 @@
 require 'ruby-libstorj'
-require_relative './storj_options'
 
-include LibStorjTest
-storj = LibStorj::Env.new(*default_options)
+options_path = File.join %W(#{__dir__} options.yml)
+storj = LibStorj::Env.new(path: options_path)
 
 storj.get_buckets do |error, buckets|
   puts "error: #{error}"

@@ -15,8 +15,10 @@ module LibStorj
   require 'ruby-libstorj/ext/upload_options'
   require 'ruby-libstorj/ext/file'
 
-  require 'ruby-libstorj/env'
   require 'ruby-libstorj/mixins/storj'
 
+  extend ::LibStorj::Storj::Mixins
   extend ::LibStorj::Ext::Storj::Mixins
+
+  require 'ruby-libstorj/env'
 end

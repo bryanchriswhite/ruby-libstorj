@@ -2,6 +2,8 @@
 # i.e. `require 'ruby-libstorj/...'`
 require_relative './lib/ruby-libstorj/arg_forwarding_task'
 
+TEMP_PATH = File.join(%W(#{__dir__} tmp))
+
 # NB: using begin/rescue so that you can use your
 #     Rakefile in an environment where RSpec is
 #     unavailable (e.g. production)
@@ -52,14 +54,12 @@ Rake::ExtensionTask.new 'ruby-libstorj'
 
 # TODO: everything that follows... but better
 LibStorj::ArgForwardingTask.new(:build, args_deps_hash: {
-    %i[no-test] => []
+    %i[no-test] => [TEMP_PATH.to_sym]
 }) do |t, args, deps|
   Rake::Task[:spec].invoke if args.to_hash[:'no-test'].nil?
 
-  directory 'tmp'
-
-  sh 'gem build ./ruby-libstorj.gemspec'
-  sh 'mv ./ruby-libstorj-*.gem ./tmp/'
+  sh 'gem build ruby-libstorj.gemspec'
+  sh "mv ruby-libstorj-*.gem #{TEMP_PATH}#{File::SEPARATOR}"
 end
 
 LibStorj::ArgForwardingTask.new(:install, args_deps_hash: {
@@ -71,6 +71,8 @@ LibStorj::ArgForwardingTask.new(:install, args_deps_hash: {
                         --no-ri \
                         --no-rdoc'
 end
+
+directory TEMP_PATH
 
 # Build (and test) when you run `rake`
 task default: %i[build]

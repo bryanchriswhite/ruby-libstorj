@@ -6,8 +6,17 @@ module LibStorj
 
     C_ANALOGUE = ::LibStorj::Ext::Storj::Env
 
-    def initialize(*options)
-      @storj_env = ::LibStorj::Ext::Storj.method(:init_env).call(*options)
+    def initialize(path:, **options)
+      # NB: ensure all options are pointers before passing them directly
+      options = {} unless options.all? {|_, o| o.is_a? ::FFI::Pointer}
+
+      if !path.nil? && File.exists?(path)
+        options = ::LibStorj.load_yaml_options(path).merge options
+      end
+
+      # puts options
+      @storj_env = ::LibStorj::Ext::Storj.method(:init_env).call(*options.values)
+
       # use ruby libuv's default_loop
       @storj_env[:loop] = ::Libuv::Ext.default_loop
     end

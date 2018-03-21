@@ -110,7 +110,7 @@ rake compile
 #### First create spec/helpers/options.yml !
 For the moment, the test suite doesn't start it's own mock backend but it does parse whatever's in the `spec/helpsers/options.yml` file to initialize `LibStorj::Ext::Storj::Env` to connect via http/https.
 
-You can copy [`spec/helpers/options.yml.example`](spec/helpers/options.example.yml) and modify it for your use:
+You can copy [`spec/helpers/options.yml.example`](options.example.yml) and modify it for your use:
 ```bash
 cp spec/helpers/options.yml.example spec/helpers/options.yml && \
 vim spec/helpers/options.yml   # or whatever

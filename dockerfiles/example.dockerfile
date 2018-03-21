@@ -21,6 +21,6 @@ RUN make install
 RUN gem install ruby-libstorj
 
 WORKDIR /storj
-COPY ./spec/helpers/storj_options.rb ./dockerfiles/test.rb ./
-COPY ./spec/helpers/options.example.yml ./options.yml
-CMD bash -c "echo '### Edit ./options.yml & edit/run `ruby ./test.rb`### && /bin/bash"
+COPY ./dockerfiles/test.rb ./test.rb
+COPY ./options.example.yml ./options.yml
+CMD bash -c 'echo "### Edit ./options.yml & edit/run ruby ./test.rb ###" && /bin/bash'

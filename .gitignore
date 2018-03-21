@@ -5,6 +5,6 @@
 *.a
 *.log
 tmp/*
-spec/helpers/options.yml
+options.yml
 Makefile
 coverage
