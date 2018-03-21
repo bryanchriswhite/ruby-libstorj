@@ -1,3 +1,4 @@
+require 'rspec/wait'
 require 'openssl'
 require_relative '../helpers/storj_options'
 include LibStorjTest
