@@ -4,6 +4,12 @@
 module LibStorj
   require 'rake'
 
+  class Rake::Task
+    # NB: backwards compatibility with rake 10.5
+    attr_reader :already_invoked
+  end
+
+
   class ArgForwardingTask
     include Rake::DSL
 
