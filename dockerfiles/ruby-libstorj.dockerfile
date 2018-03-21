@@ -5,7 +5,7 @@ RUN apt install -yqq ruby-dev rubygems-integration
 
 # copy scripts and source
 RUN mkdir -p /storj/ruby-libstorj
-COPY Gemfile Gemfile.lock ruby-libstorj.gemspec Rakefile Guardfile /storj/ruby-libstorj/
+COPY options.yml Gemfile Gemfile.lock ruby-libstorj.gemspec Rakefile Guardfile /storj/ruby-libstorj/
 COPY ./dockerfiles/setup-user /storj/ruby-libstorj/setup-user
 COPY ./lib /storj/ruby-libstorj/lib
 COPY ./spec /storj/ruby-libstorj/spec
