@@ -39,6 +39,7 @@ Until more thorough documentation is available, please see the tests:
         - `.mnemonic_check`
         - `.mnemonic_generate`
 + [`LibStorj::Env`](./spec/ruby-libstorj/env_spec.rb) _[(source)](./lib/ruby-libstorj/env.rb)_
+    - `.new`
     - `#get_info`
     - `#get_buckets`
     - `#create_bucket`

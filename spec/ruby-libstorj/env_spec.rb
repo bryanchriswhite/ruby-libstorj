@@ -242,7 +242,7 @@ RSpec.describe LibStorj::Env do
     end
   end
 
-  xdescribe '#resolve_file' do
+  describe '#resolve_file' do
     let(:test_bucket_name) {'test'}
     let(:test_file_name) {'test.data'}
     let(:test_file_path) {File.join %W(#{__dir__} .. helpers download.data)}
