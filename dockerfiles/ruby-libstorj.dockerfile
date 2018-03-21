@@ -1,4 +1,4 @@
-FROM storjlabs/storj-integration:swig-python-libstorj
+FROM storjlabs/storj-integration
 
 RUN apt update -yqq
 RUN apt install -yqq ruby-dev rubygems-integration
