@@ -2,6 +2,6 @@ install:
   - cp options.example.yml options.yml
   - docker build -t ruby-libstorj --build-arg STORJ_KEYPASS="keypass" --build-arg STORJ_EMAIL="$STORJ_EMAIL" --build-arg STORJ_PASS="$STORJ_PASS" --build-arg STORJ_MNEMONIC="$STORJ_MNEMONIC" -f ./dockerfiles/ruby-libstorj.dockerfile .
 script:
-  - docker run ruby-libstorj bash -c ". /root/.nvm/nvm.sh && /root/scripts/start_everything.sh && storj ls && storj ls test && rake && storj ls && storj ls test"
+  - docker run ruby-libstorj bash -c ". /root/.nvm/nvm.sh && /root/scripts/start_everything.sh && storj ls && storj ls test && rake ; storj ls && storj ls test"
 env:
   - STORJ_KEYPASS="keypass" STORJ_EMAIL="username@example.com" STORJ_PASS="password" STORJ_MNEMONIC="abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
