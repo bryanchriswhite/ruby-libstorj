@@ -47,6 +47,7 @@ module LibStorj
                :size, :uint64,
                :hmac, :string,
                :id, :string,
+               :bucket_id, :string,
                :decrypted, :bool,
                :index, :string
       end

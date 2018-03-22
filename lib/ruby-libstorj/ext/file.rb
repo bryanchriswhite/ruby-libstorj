@@ -17,7 +17,7 @@ module LibStorj
         FINISHED_DOWNLOAD_CALLBACK = callback %i[int pointer pointer], :void
 
         # typedef void (*storj_finished_upload_cb)(int error_status, char *file_id, void *handle);
-        FINISHED_UPLOAD_CALLBACK = callback %i[int string pointer], :void
+        FINISHED_UPLOAD_CALLBACK = callback %i[int pointer pointer], :void
 
         def initialize(*args)
           super(*args)

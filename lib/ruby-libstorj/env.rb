@@ -124,10 +124,10 @@ module LibStorj
 
       # TODO: decide precedence
       finished_proc = finished_proc || block
-      finished_cb = FFI::Function.new :void, %i[int pointer pointer] do |status, file_id, handle|
+      finished_cb = FFI::Function.new :void, %i[int pointer pointer] do |status, file, handle|
         # do error handling based on status
         ::LibStorj::Ext::LibC.fclose(file_descriptor)
-        finished_proc.call file_id
+        finished_proc.call ::LibStorj::Ext::Storj::File.new(file).id
       end
 
       # ruby_handle = FFI::MemoryPointer::NULL
@@ -168,10 +168,10 @@ module LibStorj
 
       #TODO: decide precedence
       finished_proc = finished_proc || block
-      finished_cb = FFI::Function.new :void, %i[int string pointer] do
-      |status, file_id, handle|
+      finished_cb = FFI::Function.new :void, %i[int pointer pointer] do
+      |status, file, handle|
         # do error handling based on status
-        finished_proc.call file_id
+        finished_proc.call ::LibStorj::Ext::Storj::File.new(file).id
       end
 
       # calls uv_queue_work
